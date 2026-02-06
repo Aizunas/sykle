@@ -1,0 +1,23 @@
+{
+  "name": "sykle-backend",
+  "version": "1.0.0",
+  "description": "Sykle rewards platform - Backend API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init-db": "node src/database/init.js"
+  },
+  "keywords": ["cycling", "rewards", "healthkit"],
+  "author": "Sanuzia Jorge",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
