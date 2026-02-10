@@ -5,10 +5,13 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "init-db": "node src/database/init.js"
+    "dev": "nodemon --ignore data/ src/server.js"
   },
-  "keywords": ["cycling", "rewards", "healthkit"],
+  "keywords": [
+    "cycling",
+    "rewards",
+    "healthkit"
+  ],
   "author": "Sanuzia Jorge",
   "license": "ISC",
   "dependencies": {

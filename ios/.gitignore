@@ -4,3 +4,4 @@ DerivedData/
 *.xcuserstate
 *.xcworkspace/xcuserdata/
 .DS_Store
+Secrets.swift

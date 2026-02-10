@@ -1,41 +1,69 @@
 //
-//  Untitled.swift
-//  Sykle
-//
-//  Created by Sanuzia Jorge on 18/01/2026.
-//
-
-//
 //  HomeView.swift
 //  Sykle
 //
-//  Home screen showing points balance and featured rewards
+//  Home screen with points balance and sync functionality
 //
 
 import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var healthKitManager: HealthKitManager
+    @StateObject private var userManager = UserManager.shared
+    
+    @State private var showingLoginSheet = false
+    @State private var isConnected = false
+    @State private var isCheckingConnection = false
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Points Balance Card
-                    PointsBalanceCard(points: healthKitManager.totalPoints)
+                    
+                    // Connection warning
+                    if !isConnected && userManager.isLoggedIn {
+                        ConnectionBanner(isChecking: $isCheckingConnection) {
+                            checkConnection()
+                        }
+                    }
+                    
+                    // Login prompt
+                    if !userManager.isLoggedIn {
+                        LoginPromptCard {
+                            showingLoginSheet = true
+                        }
+                    }
+                    
+                    // Points Balance
+                    PointsBalanceCard(
+                        points: userManager.isLoggedIn ? userManager.serverPoints : healthKitManager.totalPoints,
+                        isLoggedIn: userManager.isLoggedIn
+                    )
+                    
+                    // Sync Button
+                    if userManager.isLoggedIn {
+                        SyncButton(
+                            isSyncing: userManager.isSyncing,
+                            lastResult: userManager.lastSyncResult
+                        ) {
+                            Task {
+                                await userManager.syncRides(workouts: healthKitManager.cyclingWorkouts)
+                            }
+                        }
+                    }
                     
                     // Stats Row
                     HStack(spacing: 16) {
                         StatCard(
                             icon: "leaf.fill",
-                            value: String(format: "%.0fg", healthKitManager.totalCO2SavedGrams),
+                            value: formatCO2(userManager.isLoggedIn ? userManager.serverCO2SavedG : healthKitManager.totalCO2SavedGrams),
                             label: "CO₂ Saved",
                             color: .green
                         )
                         
                         StatCard(
                             icon: "bicycle",
-                            value: String(format: "%.1f km", healthKitManager.totalDistanceKm),
+                            value: String(format: "%.1f km", userManager.isLoggedIn ? userManager.serverDistanceKm : healthKitManager.totalDistanceKm),
                             label: "Distance",
                             color: Color("SykleBlue")
                         )
@@ -49,44 +77,12 @@ struct HomeView: View {
                     }
                     .padding(.horizontal)
                     
-                    // Featured Rewards Section (placeholder)
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "star.fill")
-                                .foregroundColor(.yellow)
-                            Text("Featured Rewards")
-                                .font(.system(size: 18, weight: .semibold))
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        
-                        // Placeholder reward cards
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                RewardCard(
-                                    name: "Free Coffee",
-                                    partner: "Local Cafe",
-                                    points: 500,
-                                    canAfford: healthKitManager.totalPoints >= 500
-                                )
-                                RewardCard(
-                                    name: "Pastry",
-                                    partner: "Bakery",
-                                    points: 750,
-                                    canAfford: healthKitManager.totalPoints >= 750
-                                )
-                                RewardCard(
-                                    name: "Lunch Deal",
-                                    partner: "Deli",
-                                    points: 1500,
-                                    canAfford: healthKitManager.totalPoints >= 1500
-                                )
-                            }
-                            .padding(.horizontal)
-                        }
+                    // Error message
+                    if let error = userManager.errorMessage {
+                        ErrorBanner(message: error)
                     }
                     
-                    // Recent Activity
+                    // Recent rides
                     if !healthKitManager.cyclingWorkouts.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Recent Activity")
@@ -108,28 +104,175 @@ struct HomeView: View {
             .navigationTitle("sykle.")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        healthKitManager.refresh()
-                    }) {
+                    Button(action: { healthKitManager.refresh() }) {
                         Image(systemName: "arrow.clockwise")
                     }
                 }
+            }
+            .sheet(isPresented: $showingLoginSheet) {
+                LoginSheet()
+            }
+            .onAppear {
+                checkConnection()
+            }
+        }
+    }
+    
+    private func formatCO2(_ grams: Double) -> String {
+        if grams >= 1000 {
+            return String(format: "%.1f kg", grams / 1000)
+        }
+        return String(format: "%.0fg", grams)
+    }
+    
+    private func checkConnection() {
+        isCheckingConnection = true
+        Task {
+            let connected = await NetworkManager.shared.checkConnection()
+            await MainActor.run {
+                isConnected = connected
+                isCheckingConnection = false
             }
         }
     }
 }
 
-// MARK: - Points Balance Card
-struct PointsBalanceCard: View {
-    let points: Int
+// MARK: - Supporting Views
+
+struct LoginPromptCard: View {
+    let onLogin: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "person.crop.circle.badge.plus")
+                .font(.system(size: 40))
+                .foregroundColor(Color("SykleBlue"))
+            
+            Text("Sign in to sync your rides")
+                .font(.system(size: 16, weight: .medium))
+            
+            Text("Save your points to the cloud and redeem rewards")
+                .font(.system(size: 14))
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+            
+            Button(action: onLogin) {
+                Text("Sign In")
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(Color("SykleBlue"))
+                    .cornerRadius(10)
+            }
+            .padding(.top, 8)
+        }
+        .padding(20)
+        .background(Color.white)
+        .cornerRadius(16)
+        .padding(.horizontal)
+    }
+}
+
+struct ConnectionBanner: View {
+    @Binding var isChecking: Bool
+    let onRetry: () -> Void
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "wifi.slash")
+                .foregroundColor(.orange)
+            Text("Cannot connect to server")
+                .font(.system(size: 14))
+            Spacer()
+            if isChecking {
+                ProgressView().scaleEffect(0.8)
+            } else {
+                Button("Retry", action: onRetry)
+                    .font(.system(size: 14, weight: .medium))
+            }
+        }
+        .padding()
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(10)
+        .padding(.horizontal)
+    }
+}
+
+struct ErrorBanner: View {
+    let message: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.red)
+            Text(message)
+                .font(.system(size: 14))
+                .foregroundColor(.red)
+            Spacer()
+        }
+        .padding()
+        .background(Color.red.opacity(0.1))
+        .cornerRadius(10)
+        .padding(.horizontal)
+    }
+}
+
+struct SyncButton: View {
+    let isSyncing: Bool
+    let lastResult: String?
+    let onSync: () -> Void
     
     var body: some View {
         VStack(spacing: 8) {
+            Button(action: onSync) {
+                HStack {
+                    if isSyncing {
+                        ProgressView().tint(.white)
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    Text(isSyncing ? "Syncing..." : "Sync Rides to Cloud")
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(isSyncing ? Color.gray : Color("SykleBlue"))
+                .cornerRadius(12)
+            }
+            .disabled(isSyncing)
+            
+            if let result = lastResult {
+                Text(result)
+                    .font(.system(size: 12))
+                    .foregroundColor(.green)
+            }
+        }
+        .padding(.horizontal)
+    }
+}
+
+struct PointsBalanceCard: View {
+    let points: Int
+    let isLoggedIn: Bool
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Spacer()
+                if isLoggedIn {
+                    Image(systemName: "checkmark.icloud.fill")
+                        .foregroundColor(.white.opacity(0.8))
+                        .font(.system(size: 14))
+                }
+            }
+            .padding(.horizontal, 8)
+            
             Text("Your Balance")
                 .font(.system(size: 14))
                 .foregroundColor(.white.opacity(0.8))
             
-            // Pill-shaped points display
             Text("\(points)")
                 .font(.system(size: 48, weight: .bold))
                 .foregroundColor(.white)
@@ -137,6 +280,12 @@ struct PointsBalanceCard: View {
             Text("sykles")
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white.opacity(0.8))
+            
+            if !isLoggedIn {
+                Text("(local only)")
+                    .font(.system(size: 12))
+                    .foregroundColor(.white.opacity(0.6))
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 30)
@@ -152,7 +301,6 @@ struct PointsBalanceCard: View {
     }
 }
 
-// MARK: - Stat Card
 struct StatCard: View {
     let icon: String
     let value: String
@@ -164,10 +312,8 @@ struct StatCard: View {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .foregroundColor(color)
-            
             Text(value)
                 .font(.system(size: 16, weight: .bold))
-            
             Text(label)
                 .font(.system(size: 12))
                 .foregroundColor(.gray)
@@ -179,60 +325,15 @@ struct StatCard: View {
     }
 }
 
-// MARK: - Reward Card (Placeholder)
-struct RewardCard: View {
-    let name: String
-    let partner: String
-    let points: Int
-    let canAfford: Bool
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Placeholder image
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 140, height: 80)
-                .overlay(
-                    Image(systemName: "cup.and.saucer.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(.gray.opacity(0.5))
-                )
-            
-            Text(name)
-                .font(.system(size: 14, weight: .semibold))
-            
-            Text(partner)
-                .font(.system(size: 12))
-                .foregroundColor(.gray)
-            
-            HStack {
-                Image(systemName: "star.fill")
-                    .font(.system(size: 10))
-                    .foregroundColor(.yellow)
-                Text("\(points) sykles")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(canAfford ? Color("SykleBlue") : .gray)
-            }
-        }
-        .padding(12)
-        .background(Color.white)
-        .cornerRadius(12)
-        .opacity(canAfford ? 1.0 : 0.6)
-    }
-}
-
-// MARK: - Workout Row
 struct WorkoutRow: View {
     let workout: CyclingWorkout
     
     var body: some View {
         HStack {
-            // Bike icon
             ZStack {
                 Circle()
                     .fill(Color("SykleBlue").opacity(0.1))
                     .frame(width: 44, height: 44)
-                
                 Image(systemName: "bicycle")
                     .foregroundColor(Color("SykleBlue"))
             }
@@ -240,7 +341,6 @@ struct WorkoutRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(formatDate(workout.startDate))
                     .font(.system(size: 14, weight: .medium))
-                
                 Text("\(String(format: "%.1f", workout.distanceKm)) km • \(Int(workout.durationMinutes)) min")
                     .font(.system(size: 12))
                     .foregroundColor(.gray)
@@ -248,12 +348,10 @@ struct WorkoutRow: View {
             
             Spacer()
             
-            // Points earned
             VStack(alignment: .trailing) {
                 Text("+\(workout.pointsEarned)")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(Color("SykleBlue"))
-                
                 Text("sykles")
                     .font(.system(size: 10))
                     .foregroundColor(.gray)
@@ -269,13 +367,5 @@ struct WorkoutRow: View {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: date)
-    }
-}
-
-// MARK: - Preview
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-            .environmentObject(HealthKitManager())
     }
 }

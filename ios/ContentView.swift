@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  Sykle
 //
-//  Created by Sanuzia Jorge on 18/01/2026.
+//  Main content view with tab navigation
 //
 
 import SwiftUI
@@ -11,7 +11,6 @@ struct ContentView: View {
     @EnvironmentObject var healthKitManager: HealthKitManager
     
     var body: some View {
-        // Check if authorized - show onboarding or main app
         if healthKitManager.isAuthorized {
             MainTabView()
         } else {
@@ -20,7 +19,8 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Main Tab View (shown after authorization)
+// MARK: - Main Tab View
+
 struct MainTabView: View {
     var body: some View {
         TabView {
@@ -28,6 +28,12 @@ struct MainTabView: View {
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")
+                }
+            
+            PartnersView()
+                .tabItem {
+                    Image(systemName: "cup.and.saucer.fill")
+                    Text("Partners")
                 }
             
             WorkoutsListView()
@@ -46,7 +52,6 @@ struct MainTabView: View {
     }
 }
 
-// MARK: - Preview
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()

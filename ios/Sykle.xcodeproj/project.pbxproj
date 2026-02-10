@@ -13,6 +13,14 @@
 		335EF3F32F1D72F90098277C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F22F1D72F90098277C /* HomeView.swift */; };
 		335EF3F52F1D731B0098277C /* WorkoutsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F42F1D73190098277C /* WorkoutsListView.swift */; };
 		335EF3F72F1D732E0098277C /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F62F1D732B0098277C /* ProfileView.swift */; };
+		33D412692F366A9000A6F8B8 /* PartnerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D412672F366A9000A6F8B8 /* PartnerDetailView.swift */; };
+		33D4126A2F366A9000A6F8B8 /* PartnersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D412682F366A9000A6F8B8 /* PartnersView.swift */; };
+		33D412722F366AA700A6F8B8 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126F2F366AA700A6F8B8 /* Secrets.swift */; };
+		33D412732F366AA700A6F8B8 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126C2F366AA700A6F8B8 /* Config.swift */; };
+		33D412742F366AA700A6F8B8 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126E2F366AA700A6F8B8 /* NetworkManager.swift */; };
+		33D412752F366AA700A6F8B8 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D412712F366AA700A6F8B8 /* UserManager.swift */; };
+		33D412772F366AA700A6F8B8 /* LoginSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126D2F366AA700A6F8B8 /* LoginSheet.swift */; };
+		33D412782F366AA700A6F8B8 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126B2F366AA700A6F8B8 /* APIModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +50,14 @@
 		335EF3F22F1D72F90098277C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		335EF3F42F1D73190098277C /* WorkoutsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsListView.swift; sourceTree = "<group>"; };
 		335EF3F62F1D732B0098277C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		33D412672F366A9000A6F8B8 /* PartnerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerDetailView.swift; sourceTree = "<group>"; };
+		33D412682F366A9000A6F8B8 /* PartnersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersView.swift; sourceTree = "<group>"; };
+		33D4126B2F366AA700A6F8B8 /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
+		33D4126C2F366AA700A6F8B8 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		33D4126D2F366AA700A6F8B8 /* LoginSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSheet.swift; sourceTree = "<group>"; };
+		33D4126E2F366AA700A6F8B8 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		33D4126F2F366AA700A6F8B8 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		33D412712F366AA700A6F8B8 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -94,6 +110,14 @@
 				335EF3EE2F1D72D80098277C /* ContentView.swift */,
 				335EF3F02F1D72E60098277C /* OnboardingView.swift */,
 				335EF3F22F1D72F90098277C /* HomeView.swift */,
+				33D412672F366A9000A6F8B8 /* PartnerDetailView.swift */,
+				33D412682F366A9000A6F8B8 /* PartnersView.swift */,
+				33D4126B2F366AA700A6F8B8 /* APIModels.swift */,
+				33D4126C2F366AA700A6F8B8 /* Config.swift */,
+				33D4126D2F366AA700A6F8B8 /* LoginSheet.swift */,
+				33D4126E2F366AA700A6F8B8 /* NetworkManager.swift */,
+				33D4126F2F366AA700A6F8B8 /* Secrets.swift */,
+				33D412712F366AA700A6F8B8 /* UserManager.swift */,
 				335EF3F42F1D73190098277C /* WorkoutsListView.swift */,
 				335EF3F62F1D732B0098277C /* ProfileView.swift */,
 				335EF3C02F1D54580098277C /* Sykle */,
@@ -260,8 +284,16 @@
 				335EF3ED2F1D72D30098277C /* HealthKitManager.swift in Sources */,
 				335EF3F32F1D72F90098277C /* HomeView.swift in Sources */,
 				335EF3F12F1D72EE0098277C /* OnboardingView.swift in Sources */,
+				33D412692F366A9000A6F8B8 /* PartnerDetailView.swift in Sources */,
+				33D4126A2F366A9000A6F8B8 /* PartnersView.swift in Sources */,
 				335EF3F52F1D731B0098277C /* WorkoutsListView.swift in Sources */,
 				335EF3F72F1D732E0098277C /* ProfileView.swift in Sources */,
+				33D412722F366AA700A6F8B8 /* Secrets.swift in Sources */,
+				33D412732F366AA700A6F8B8 /* Config.swift in Sources */,
+				33D412742F366AA700A6F8B8 /* NetworkManager.swift in Sources */,
+				33D412752F366AA700A6F8B8 /* UserManager.swift in Sources */,
+				33D412772F366AA700A6F8B8 /* LoginSheet.swift in Sources */,
+				33D412782F366AA700A6F8B8 /* APIModels.swift in Sources */,
 				335EF3EF2F1D72E30098277C /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
