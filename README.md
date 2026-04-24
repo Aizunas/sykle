@@ -3,7 +3,7 @@
 
 Sykle is a native iOS cycling rewards platform built for London. Earn sykles for every verified cycling workout and redeem them at independent local cafés and bakeries.
 
-Built as a Final Year Project for MSc Computing at Goldsmiths, University of London (2026).
+Built as a Final Year Project.
 
 ---
 
