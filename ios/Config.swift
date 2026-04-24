@@ -17,8 +17,8 @@ struct Config {
         // Development - uses IP from Secrets.swift
         static let apiBaseURL = "http://\(Secrets.macIPAddress):3000/api"
     #else
-        // Production - update this when you deploy
-        static let apiBaseURL = "https://your-deployed-api.com/api"
+        // Production - update this when deploy
+    static let baseURL = "https://parsnip-yodel-culinary.ngrok-free.dev/api"
     #endif
     
     // ===========================================
