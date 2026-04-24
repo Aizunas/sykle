@@ -125,8 +125,11 @@ CO₂ saved is calculated at 150g per km compared to driving.
 
 | Field | Value |
 |-------|-------|
-| Email | tester@sykle.app |
+| Email | sykletester@gmail.com |
 | Password | Sykle2026 |
+
+first name - Test 
+Last name - User 
 
 This account is pre-loaded with **50,000 sykles** so you can test the full redemption flow immediately.
 
