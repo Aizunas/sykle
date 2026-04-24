@@ -129,11 +129,19 @@ class NetworkManager: ObservableObject {
         }
     }
     
+    
     // MARK: - User API
     
     /// Create a new user or get existing user by email
-    func createUser(email: String, name: String?) async throws -> APIUser {
-        let requestBody = CreateUserRequest(email: email, name: name)
+    func createUser(email: String, name: String?, password: String) async throws -> APIUser {
+        let firstName = name?.components(separatedBy: " ").first
+        let lastName = name?.components(separatedBy: " ").dropFirst().joined(separator: " ")
+        let requestBody = CreateUserRequest(
+            email: email,
+            firstName: firstName,
+            lastName: lastName?.isEmpty == false ? lastName : nil,
+            password: password
+        )
         let body = try JSONEncoder().encode(requestBody)
         
         let response: CreateUserResponse = try await request(
@@ -243,5 +251,29 @@ class NetworkManager: ObservableObject {
             print("❌ Connection check failed: \(error)")
             return false
         }
+    }
+    
+    func checkEmailExists(_ email: String) async throws -> Bool {
+        struct CheckResponse: Decodable { let exists: Bool }
+        let body = try JSONEncoder().encode(["email": email])
+        let response: CheckResponse = try await request(
+            endpoint: "users/check",
+            method: "POST",
+            body: body
+        )
+        return response.exists
+    }
+    
+    func updateUser(id: String, firstName: String, lastName: String) async throws -> APIUser {
+        struct UpdateRequest: Encodable { let firstName: String; let lastName: String }
+        struct UpdateResponse: Decodable { let user: APIUser }
+        let body = try JSONEncoder().encode(UpdateRequest(firstName: firstName, lastName: lastName))
+        let response: UpdateResponse = try await request(endpoint: "users/\(id)", method: "PUT", body: body)
+        return response.user
+    }
+
+    func deleteUser(id: String) async throws {
+        struct DeleteResponse: Decodable { let message: String }
+        let _: DeleteResponse = try await request(endpoint: "users/\(id)", method: "DELETE", body: nil)
     }
 }

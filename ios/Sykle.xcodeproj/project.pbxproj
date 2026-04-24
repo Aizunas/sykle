@@ -7,12 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		332A3A9C2F9A8B1700038615 /* PartnerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332A3A9B2F9A8B1700038615 /* PartnerStore.swift */; };
+		332A3A9E2F9A8B1E00038615 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332A3A9D2F9A8B1E00038615 /* Models.swift */; };
+		332A3AA02F9A975000038615 /* BasketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332A3A9F2F9A971D00038615 /* BasketManager.swift */; };
+		332A3AA22F9AA91D00038615 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332A3AA12F9AA90E00038615 /* LocationManager.swift */; };
+		332A3AA62F9AE79B00038615 /* PastOrdersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332A3AA52F9AE78900038615 /* PastOrdersView.swift */; };
+		332A3AAA2F9B107400038615 /* EditDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332A3AA92F9B106500038615 /* EditDetailsView.swift */; };
 		335EF3ED2F1D72D30098277C /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3EC2F1D72B40098277C /* HealthKitManager.swift */; };
 		335EF3EF2F1D72E30098277C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3EE2F1D72D80098277C /* ContentView.swift */; };
 		335EF3F12F1D72EE0098277C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F02F1D72E60098277C /* OnboardingView.swift */; };
 		335EF3F32F1D72F90098277C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F22F1D72F90098277C /* HomeView.swift */; };
 		335EF3F52F1D731B0098277C /* WorkoutsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F42F1D73190098277C /* WorkoutsListView.swift */; };
 		335EF3F72F1D732E0098277C /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F62F1D732B0098277C /* ProfileView.swift */; };
+		339711672F9456E100D1CD51 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711652F9456D800D1CD51 /* SplashView.swift */; };
+		339711692F945FBF00D1CD51 /* OnboardingCarouselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711682F945FBB00D1CD51 /* OnboardingCarouselView.swift */; };
+		3397116B2F94617600D1CD51 /*   AuthSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397116A2F94616E00D1CD51 /*   AuthSheet.swift */; };
+		3397116D2F956D7E00D1CD51 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397116C2F956D6700D1CD51 /* WelcomeView.swift */; };
+		3397116F2F9578B600D1CD51 /* SyncHealthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397116E2F9578A000D1CD51 /* SyncHealthView.swift */; };
+		339711712F958AB500D1CD51 /* NotificationsPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711702F958AB200D1CD51 /* NotificationsPermissionView.swift */; };
+		339711732F95A9B600D1CD51 /* LeaderboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711722F95A9B600D1CD51 /* LeaderboardView.swift */; };
+		339711752F95A9CA00D1CD51 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711742F95A9CA00D1CD51 /* MapView.swift */; };
+		339711772F95AB1700D1CD51 /* FilteredPartnersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711762F95AB1400D1CD51 /* FilteredPartnersView.swift */; };
+		339711792F95AE1000D1CD51 /* ShoreditchLondon.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 339711782F95AE1000D1CD51 /* ShoreditchLondon.gpx */; };
+		339711892F96C88E00D1CD51 /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711882F96C88200D1CD51 /* FilterSheet.swift */; };
+		3397118B2F96D2AF00D1CD51 /* BasketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397118A2F96D2A200D1CD51 /* BasketView.swift */; };
+		3397118D2F96E24100D1CD51 /* FavouritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397118C2F96E23500D1CD51 /* FavouritesView.swift */; };
+		3397118F2F96E27600D1CD51 /* VoucherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397118E2F96E26700D1CD51 /* VoucherView.swift */; };
+		3397119F2F982FCA00D1CD51 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397119E2F982FC000D1CD51 /* WalletView.swift */; };
+		339711A12F982FE200D1CD51 /* VoucherStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711A02F982FD800D1CD51 /* VoucherStore.swift */; };
+		339711A32F98480800D1CD51 /* SykleColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711A22F98480800D1CD51 /* SykleColors.swift */; };
 		33D412692F366A9000A6F8B8 /* PartnerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D412672F366A9000A6F8B8 /* PartnerDetailView.swift */; };
 		33D4126A2F366A9000A6F8B8 /* PartnersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D412682F366A9000A6F8B8 /* PartnersView.swift */; };
 		33D412722F366AA700A6F8B8 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126F2F366AA700A6F8B8 /* Secrets.swift */; };
@@ -21,6 +44,7 @@
 		33D412752F366AA700A6F8B8 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D412712F366AA700A6F8B8 /* UserManager.swift */; };
 		33D412772F366AA700A6F8B8 /* LoginSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126D2F366AA700A6F8B8 /* LoginSheet.swift */; };
 		33D412782F366AA700A6F8B8 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D4126B2F366AA700A6F8B8 /* APIModels.swift */; };
+		33E2BFC82F913DD400855F5D /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E2BFC72F913DBE00855F5D /* QRCodeGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +65,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		332A3A9B2F9A8B1700038615 /* PartnerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerStore.swift; sourceTree = "<group>"; };
+		332A3A9D2F9A8B1E00038615 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		332A3A9F2F9A971D00038615 /* BasketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketManager.swift; sourceTree = "<group>"; };
+		332A3AA12F9AA90E00038615 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		332A3AA52F9AE78900038615 /* PastOrdersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastOrdersView.swift; sourceTree = "<group>"; };
+		332A3AA92F9B106500038615 /* EditDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDetailsView.swift; sourceTree = "<group>"; };
 		335EF3BE2F1D54580098277C /* Sykle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sykle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		335EF3CE2F1D545B0098277C /* SykleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SykleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		335EF3D82F1D545B0098277C /* SykleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SykleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,6 +80,23 @@
 		335EF3F22F1D72F90098277C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		335EF3F42F1D73190098277C /* WorkoutsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsListView.swift; sourceTree = "<group>"; };
 		335EF3F62F1D732B0098277C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		339711652F9456D800D1CD51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		339711682F945FBB00D1CD51 /* OnboardingCarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCarouselView.swift; sourceTree = "<group>"; };
+		3397116A2F94616E00D1CD51 /*   AuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "  AuthSheet.swift"; sourceTree = "<group>"; };
+		3397116C2F956D6700D1CD51 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		3397116E2F9578A000D1CD51 /* SyncHealthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncHealthView.swift; sourceTree = "<group>"; };
+		339711702F958AB200D1CD51 /* NotificationsPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsPermissionView.swift; sourceTree = "<group>"; };
+		339711722F95A9B600D1CD51 /* LeaderboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardView.swift; sourceTree = "<group>"; };
+		339711742F95A9CA00D1CD51 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		339711762F95AB1400D1CD51 /* FilteredPartnersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredPartnersView.swift; sourceTree = "<group>"; };
+		339711782F95AE1000D1CD51 /* ShoreditchLondon.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShoreditchLondon.gpx; sourceTree = "<group>"; };
+		339711882F96C88200D1CD51 /* FilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSheet.swift; sourceTree = "<group>"; };
+		3397118A2F96D2A200D1CD51 /* BasketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketView.swift; sourceTree = "<group>"; };
+		3397118C2F96E23500D1CD51 /* FavouritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouritesView.swift; sourceTree = "<group>"; };
+		3397118E2F96E26700D1CD51 /* VoucherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoucherView.swift; sourceTree = "<group>"; };
+		3397119E2F982FC000D1CD51 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
+		339711A02F982FD800D1CD51 /* VoucherStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoucherStore.swift; sourceTree = "<group>"; };
+		339711A22F98480800D1CD51 /* SykleColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SykleColors.swift; sourceTree = "<group>"; };
 		33D412672F366A9000A6F8B8 /* PartnerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnerDetailView.swift; sourceTree = "<group>"; };
 		33D412682F366A9000A6F8B8 /* PartnersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersView.swift; sourceTree = "<group>"; };
 		33D4126B2F366AA700A6F8B8 /* APIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIModels.swift; sourceTree = "<group>"; };
@@ -58,11 +105,25 @@
 		33D4126E2F366AA700A6F8B8 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		33D4126F2F366AA700A6F8B8 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		33D412712F366AA700A6F8B8 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
+		33E2BFC72F913DBE00855F5D /* QRCodeGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		332A3AA42F9AA9D200038615 /* Exceptions for "Sykle" folder in "Sykle" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 335EF3BD2F1D54580098277C /* Sykle */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		335EF3C02F1D54580098277C /* Sykle */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				332A3AA42F9AA9D200038615 /* Exceptions for "Sykle" folder in "Sykle" target */,
+			);
 			path = Sykle;
 			sourceTree = "<group>";
 		};
@@ -110,20 +171,44 @@
 				335EF3EE2F1D72D80098277C /* ContentView.swift */,
 				335EF3F02F1D72E60098277C /* OnboardingView.swift */,
 				335EF3F22F1D72F90098277C /* HomeView.swift */,
+				3397119E2F982FC000D1CD51 /* WalletView.swift */,
+				339711A02F982FD800D1CD51 /* VoucherStore.swift */,
+				3397118C2F96E23500D1CD51 /* FavouritesView.swift */,
+				3397118E2F96E26700D1CD51 /* VoucherView.swift */,
+				339711882F96C88200D1CD51 /* FilterSheet.swift */,
+				339711762F95AB1400D1CD51 /* FilteredPartnersView.swift */,
 				33D412672F366A9000A6F8B8 /* PartnerDetailView.swift */,
+				3397118A2F96D2A200D1CD51 /* BasketView.swift */,
+				332A3A9F2F9A971D00038615 /* BasketManager.swift */,
 				33D412682F366A9000A6F8B8 /* PartnersView.swift */,
 				33D4126B2F366AA700A6F8B8 /* APIModels.swift */,
 				33D4126C2F366AA700A6F8B8 /* Config.swift */,
 				33D4126D2F366AA700A6F8B8 /* LoginSheet.swift */,
 				33D4126E2F366AA700A6F8B8 /* NetworkManager.swift */,
+				33E2BFC72F913DBE00855F5D /* QRCodeGenerator.swift */,
 				33D4126F2F366AA700A6F8B8 /* Secrets.swift */,
 				33D412712F366AA700A6F8B8 /* UserManager.swift */,
-				335EF3F42F1D73190098277C /* WorkoutsListView.swift */,
+				332A3AA92F9B106500038615 /* EditDetailsView.swift */,
+				339711652F9456D800D1CD51 /* SplashView.swift */,
+				339711682F945FBB00D1CD51 /* OnboardingCarouselView.swift */,
+				3397116A2F94616E00D1CD51 /*   AuthSheet.swift */,
+				3397116C2F956D6700D1CD51 /* WelcomeView.swift */,
+				3397116E2F9578A000D1CD51 /* SyncHealthView.swift */,
 				335EF3F62F1D732B0098277C /* ProfileView.swift */,
+				339711702F958AB200D1CD51 /* NotificationsPermissionView.swift */,
+				332A3AA52F9AE78900038615 /* PastOrdersView.swift */,
+				335EF3F42F1D73190098277C /* WorkoutsListView.swift */,
 				335EF3C02F1D54580098277C /* Sykle */,
 				335EF3D12F1D545B0098277C /* SykleTests */,
 				335EF3DB2F1D545B0098277C /* SykleUITests */,
 				335EF3BF2F1D54580098277C /* Products */,
+				339711722F95A9B600D1CD51 /* LeaderboardView.swift */,
+				339711742F95A9CA00D1CD51 /* MapView.swift */,
+				339711782F95AE1000D1CD51 /* ShoreditchLondon.gpx */,
+				339711A22F98480800D1CD51 /* SykleColors.swift */,
+				332A3A9B2F9A8B1700038615 /* PartnerStore.swift */,
+				332A3AA12F9AA90E00038615 /* LocationManager.swift */,
+				332A3A9D2F9A8B1E00038615 /* Models.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -257,6 +342,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				339711792F95AE1000D1CD51 /* ShoreditchLondon.gpx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,18 +368,41 @@
 			buildActionMask = 2147483647;
 			files = (
 				335EF3ED2F1D72D30098277C /* HealthKitManager.swift in Sources */,
+				332A3AA02F9A975000038615 /* BasketManager.swift in Sources */,
+				332A3A9E2F9A8B1E00038615 /* Models.swift in Sources */,
+				332A3AA62F9AE79B00038615 /* PastOrdersView.swift in Sources */,
+				339711A12F982FE200D1CD51 /* VoucherStore.swift in Sources */,
+				339711752F95A9CA00D1CD51 /* MapView.swift in Sources */,
 				335EF3F32F1D72F90098277C /* HomeView.swift in Sources */,
+				339711672F9456E100D1CD51 /* SplashView.swift in Sources */,
+				339711A32F98480800D1CD51 /* SykleColors.swift in Sources */,
+				332A3AA22F9AA91D00038615 /* LocationManager.swift in Sources */,
 				335EF3F12F1D72EE0098277C /* OnboardingView.swift in Sources */,
 				33D412692F366A9000A6F8B8 /* PartnerDetailView.swift in Sources */,
+				33E2BFC82F913DD400855F5D /* QRCodeGenerator.swift in Sources */,
 				33D4126A2F366A9000A6F8B8 /* PartnersView.swift in Sources */,
 				335EF3F52F1D731B0098277C /* WorkoutsListView.swift in Sources */,
+				332A3AAA2F9B107400038615 /* EditDetailsView.swift in Sources */,
+				3397118B2F96D2AF00D1CD51 /* BasketView.swift in Sources */,
+				3397119F2F982FCA00D1CD51 /* WalletView.swift in Sources */,
+				339711772F95AB1700D1CD51 /* FilteredPartnersView.swift in Sources */,
 				335EF3F72F1D732E0098277C /* ProfileView.swift in Sources */,
+				332A3A9C2F9A8B1700038615 /* PartnerStore.swift in Sources */,
+				3397118F2F96E27600D1CD51 /* VoucherView.swift in Sources */,
 				33D412722F366AA700A6F8B8 /* Secrets.swift in Sources */,
 				33D412732F366AA700A6F8B8 /* Config.swift in Sources */,
+				3397116F2F9578B600D1CD51 /* SyncHealthView.swift in Sources */,
 				33D412742F366AA700A6F8B8 /* NetworkManager.swift in Sources */,
 				33D412752F366AA700A6F8B8 /* UserManager.swift in Sources */,
+				339711732F95A9B600D1CD51 /* LeaderboardView.swift in Sources */,
+				3397116B2F94617600D1CD51 /*   AuthSheet.swift in Sources */,
+				3397116D2F956D7E00D1CD51 /* WelcomeView.swift in Sources */,
 				33D412772F366AA700A6F8B8 /* LoginSheet.swift in Sources */,
+				339711892F96C88E00D1CD51 /* FilterSheet.swift in Sources */,
+				339711712F958AB500D1CD51 /* NotificationsPermissionView.swift in Sources */,
+				339711692F945FBF00D1CD51 /* OnboardingCarouselView.swift in Sources */,
 				33D412782F366AA700A6F8B8 /* APIModels.swift in Sources */,
+				3397118D2F96E24100D1CD51 /* FavouritesView.swift in Sources */,
 				335EF3EF2F1D72E30098277C /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -461,8 +570,10 @@
 				DEVELOPMENT_TEAM = U5Y26N9HLT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sykle/Info.plist;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Sykle needs access to your cycling workouts to calculate your reward points.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Sykle needs access to your health data to track your cycling activity.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Sykle uses your location to show nearby partner cafés and bakeries.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -493,8 +604,10 @@
 				DEVELOPMENT_TEAM = U5Y26N9HLT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sykle/Info.plist;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Sykle needs access to your cycling workouts to calculate your reward points.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Sykle needs access to your health data to track your cycling activity.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Sykle uses your location to show nearby partner cafés and bakeries.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

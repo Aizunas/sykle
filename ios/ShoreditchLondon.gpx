@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Sykle"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+
+  <!--
+    Simulated location: Shoreditch, London
+    Latitude:  51.5228
+    Longitude: -0.0755
+    This places the user in the middle of all fake Sykle partners.
+    
+    HOW TO USE IN XCODE:
+    1. Add this file to your Xcode project (drag into project navigator)
+    2. Run the app on Simulator or a real device
+    3. In Xcode menu: Debug > Simulate Location > ShoreditchLondon
+    OR
+    3. In the Simulator: Features > Location > Custom Location
+       Enter: 51.5228, -0.0755
+  -->
+
+  <wpt lat="51.5228" lon="-0.0755">
+    <name>Shoreditch London - Sykle HQ</name>
+    <desc>Simulated user location for Sykle testing</desc>
+  </wpt>
+
+</gpx>

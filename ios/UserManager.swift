@@ -23,6 +23,7 @@ class UserManager: ObservableObject {
     @Published var serverPoints: Int = 0
     @Published var serverDistanceKm: Double = 0
     @Published var serverCO2SavedG: Double = 0
+    @Published var lastSyncPoints: Int = UserDefaults.standard.integer(forKey: "sykle_last_sync_points")
     
     // MARK: - Private Properties
     
@@ -61,21 +62,30 @@ class UserManager: ObservableObject {
     // MARK: - Login / Register
     
     /// Create or login user with email
-    func loginOrRegister(email: String, name: String?) async {
+    func loginOrRegister(email: String, name: String?, password: String) async {
         do {
-            let user = try await networkManager.createUser(email: email, name: name)
+            let user = try await networkManager.createUser(email: email, name: name, password: password)
             
             await MainActor.run {
                 self.currentUser = user
                 self.isLoggedIn = true
                 self.serverPoints = user.totalPoints
                 self.serverDistanceKm = user.totalDistanceKm
-                self.serverCO2SavedG = user.totalCo2SavedG
+                self.serverCO2SavedG = user.totalCO2SavedG
                 self.errorMessage = nil
                 self.saveUserId(user.id, email: email)
             }
             
             print("✅ Logged in as: \(user.email) (ID: \(user.id))")
+            
+            // Auto-sync rides after login
+            let healthKit = await MainActor.run {
+                HealthKitManager()
+            }
+            // Give HealthKit a moment to fetch
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            await self.syncRides(workouts: healthKit.allWorkouts)
+            
             
         } catch {
             await MainActor.run {
@@ -96,7 +106,7 @@ class UserManager: ObservableObject {
                     self.isLoggedIn = true
                     self.serverPoints = user.totalPoints
                     self.serverDistanceKm = user.totalDistanceKm
-                    self.serverCO2SavedG = user.totalCo2SavedG
+                    self.serverCO2SavedG = user.totalCO2SavedG
                 }
                 
                 print("✅ Loaded user: \(user.email)")
@@ -144,9 +154,12 @@ class UserManager: ObservableObject {
                 self.serverCO2SavedG = Double(response.user.totalCO2SavedGrams)
                 
                 if response.summary.newRidesSynced > 0 {
+                    self.lastSyncPoints = response.summary.pointsEarned
+                    UserDefaults.standard.set(response.summary.pointsEarned, forKey: "sykle_last_sync_points")
                     self.lastSyncResult = "Synced \(response.summary.newRidesSynced) rides! +\(response.summary.pointsEarned) sykles"
                 } else {
                     self.lastSyncResult = "All rides already synced"
+                    // lastSyncPoints unchanged — keeps showing last real earn
                 }
             }
             
@@ -174,11 +187,40 @@ class UserManager: ObservableObject {
                 self.currentUser = user
                 self.serverPoints = user.totalPoints
                 self.serverDistanceKm = user.totalDistanceKm
-                self.serverCO2SavedG = user.totalCo2SavedG
+                self.serverCO2SavedG = user.totalCO2SavedG
             }
             
         } catch {
             print("❌ Failed to refresh user: \(error)")
+        }
+    }
+    
+    func updateUser(firstName: String, lastName: String) async {
+        guard let userId = currentUser?.id else { return }
+        do {
+            let user = try await networkManager.updateUser(id: userId, firstName: firstName, lastName: lastName)
+            await MainActor.run {
+                self.currentUser = user
+            }
+            print("✅ User updated")
+        } catch {
+            print("❌ Failed to update user: \(error)")
+        }
+    }
+
+    func deleteAccount() async {
+        guard let userId = currentUser?.id else { return }
+        do {
+            try await networkManager.deleteUser(id: userId)
+            await MainActor.run {
+                self.clearUser()
+                UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                UserDefaults.standard.set(false, forKey: "hasRequestedHealth")
+                UserDefaults.standard.set(false, forKey: "hasRequestedNotifications")
+            }
+            print("✅ Account deleted")
+        } catch {
+            print("❌ Failed to delete account: \(error)")
         }
     }
 }

@@ -37,15 +37,58 @@ class HealthKitManager: ObservableObject {
     // Published properties that the UI will observe
     @Published var isAuthorized = false
     @Published var authorizationStatus: String = "Not Requested"
-    @Published var cyclingWorkouts: [CyclingWorkout] = []
+    
+    // All cycling workouts (all time)
+    @Published var allWorkouts: [CyclingWorkout] = []
+    
+    // Weekly workouts (last 7 days)
+    @Published var weeklyWorkouts: [CyclingWorkout] = []
+    
+    // All time stats (for points and CO2)
     @Published var totalPoints: Int = 0
-    @Published var totalDistanceKm: Double = 0
     @Published var totalCO2SavedGrams: Double = 0
+    
+    // Weekly stats (for km and minutes)
+    @Published var weeklyDistanceKm: Double = 0
+    @Published var weeklyMinutes: Double = 0
+    
+    // All time totals (kept for reference)
+    @Published var totalDistanceKm: Double = 0
+    @Published var totalMinutes: Double = 0
+    
+    // Last sync info
+    @Published var lastSyncDate: Date?
+    @Published var lastSyncPoints: Int = 0
+    
     @Published var isLoading = false
     @Published var errorMessage: String?
     
+    var onWorkoutsFetched: (([CyclingWorkout]) -> Void)?
+    
     // HealthKit store
     private let healthStore = HKHealthStore()
+    
+    init() {
+        checkExistingAuthorization()
+    }
+    
+    private func checkExistingAuthorization() {
+        guard isHealthKitAvailable else { return }
+        
+        // Check read authorization status for workout type
+        let workoutType = HKObjectType.workoutType()
+        let status = healthStore.authorizationStatus(for: workoutType)
+        
+        // For read-only access, notDetermined means we haven't asked yet
+        // sharingDenied means the user explicitly denied — but we should still try to read
+        // Apple doesn't expose read authorization status directly for privacy reasons
+        // So we just attempt to fetch and see if data comes back
+        DispatchQueue.main.async {
+            self.isAuthorized = true  // Assume authorized if we've been through onboarding
+            self.authorizationStatus = "Authorized ✓"
+            self.fetchAllData()
+        }
+    }
     
     // MARK: - Check if HealthKit is available
     var isHealthKitAvailable: Bool {
@@ -54,7 +97,6 @@ class HealthKitManager: ObservableObject {
     
     // MARK: - Request Authorization
     func requestAuthorization() {
-        // Check if HealthKit is available on this device
         guard isHealthKitAvailable else {
             DispatchQueue.main.async {
                 self.authorizationStatus = "HealthKit not available on this device"
@@ -63,60 +105,59 @@ class HealthKitManager: ObservableObject {
             return
         }
         
-        // Define the data types we want to read
         let typesToRead: Set<HKObjectType> = [
-            HKObjectType.workoutType(),                                          // Workouts (cycling)
-            HKObjectType.quantityType(forIdentifier: .distanceCycling)!,        // Cycling distance
-            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!      // Calories
+            HKObjectType.workoutType(),
+            HKObjectType.quantityType(forIdentifier: .distanceCycling)!,
+            HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
         ]
         
-        // Request authorization
         healthStore.requestAuthorization(toShare: nil, read: typesToRead) { success, error in
             DispatchQueue.main.async {
-                if success {
-                    self.isAuthorized = true
-                    self.authorizationStatus = "Authorized ✓"
-                    self.errorMessage = nil
-                    
-                    // Automatically fetch workouts after authorization
-                    self.fetchCyclingWorkouts()
-                } else {
-                    self.isAuthorized = false
-                    self.authorizationStatus = "Authorization Denied"
-                    if let error = error {
-                        self.errorMessage = error.localizedDescription
-                    }
-                }
+                // Always set authorized to true — Apple won't tell us read status
+                self.isAuthorized = true
+                self.authorizationStatus = "Authorized ✓"
+                self.errorMessage = nil
+                self.fetchAllData()
             }
         }
     }
     
+    // MARK: - Fetch All Data (All Time + Weekly)
+    func fetchAllData() {
+        fetchCyclingWorkouts(daysBack: nil) // All time
+    }
+    
     // MARK: - Fetch Cycling Workouts
-    func fetchCyclingWorkouts(daysBack: Int = 30) {
+    // daysBack: nil = all time, or specify number of days
+    func fetchCyclingWorkouts(daysBack: Int? = nil) {
+        print("🏃 fetchCyclingWorkouts called, isAuthorized: \(isAuthorized)")
         guard isAuthorized else {
             errorMessage = "Please authorize HealthKit access first"
             return
         }
         
+        var onWorkoutsFetched: (([CyclingWorkout]) -> Void)?
+        
         isLoading = true
         errorMessage = nil
         
-        // Calculate the start date (e.g., 30 days ago)
         let calendar = Calendar.current
         let endDate = Date()
-        guard let startDate = calendar.date(byAdding: .day, value: -daysBack, to: endDate) else {
-            return
+        
+        // For all time, go back 10 years (effectively all data)
+        let startDate: Date
+        if let days = daysBack {
+            startDate = calendar.date(byAdding: .day, value: -days, to: endDate) ?? endDate
+        } else {
+            startDate = calendar.date(byAdding: .year, value: -10, to: endDate) ?? endDate
         }
         
-        // Create a predicate to filter workouts by date and type
         let datePredicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
         let workoutTypePredicate = HKQuery.predicateForWorkouts(with: .cycling)
         let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [datePredicate, workoutTypePredicate])
         
-        // Sort by start date (most recent first)
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
         
-        // Create the query
         let query = HKSampleQuery(
             sampleType: HKObjectType.workoutType(),
             predicate: compoundPredicate,
@@ -134,19 +175,15 @@ class HealthKitManager: ObservableObject {
                 
                 guard let workouts = samples as? [HKWorkout] else {
                     self?.errorMessage = "No cycling workouts found"
-                    self?.cyclingWorkouts = []
+                    self?.allWorkouts = []
+                    self?.weeklyWorkouts = []
                     return
                 }
                 
-                // Convert HKWorkout to our CyclingWorkout model
-                self?.cyclingWorkouts = workouts.map { workout in
-                    // Get distance - use the new API
+                // Convert to CyclingWorkout model
+                let cyclingWorkouts = workouts.map { workout in
                     let distanceKm = self?.getWorkoutDistance(workout) ?? 0
-                    
-                    // Get duration
                     let durationMinutes = workout.duration / 60
-                    
-                    // Get calories - use the new API for iOS 18+
                     let calories = self?.getWorkoutCalories(workout)
                     
                     return CyclingWorkout(
@@ -159,23 +196,59 @@ class HealthKitManager: ObservableObject {
                     )
                 }
                 
-                // Calculate totals
-                self?.calculateTotals()
+                // Store all workouts
+                self?.allWorkouts = cyclingWorkouts
+                
+                // Filter for weekly workouts (last 7 days)
+                let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+                self?.weeklyWorkouts = cyclingWorkouts.filter { $0.startDate >= sevenDaysAgo }
+                
+                // Calculate stats
+                self?.calculateStats()
+                
+                DispatchQueue.main.async {
+                    self?.onWorkoutsFetched?(self?.allWorkouts ?? [])
+                }
+                
+                if let workouts = self?.allWorkouts {
+                    self?.onWorkoutsFetched?(workouts)
+                }
+                
+                // Set last sync info (most recent workout)
+                if let mostRecent = cyclingWorkouts.first {
+                    self?.lastSyncDate = mostRecent.startDate
+                    self?.lastSyncPoints = mostRecent.pointsEarned
+                }
             }
         }
         
-        // Execute the query
         healthStore.execute(query)
+    }
+    
+    // MARK: - Calculate Stats
+    private func calculateStats() {
+        // All time stats (points and CO2)
+        totalPoints = allWorkouts.reduce(0) { $0 + $1.pointsEarned }
+        totalCO2SavedGrams = allWorkouts.reduce(0) { $0 + $1.co2SavedGrams }
+        totalDistanceKm = allWorkouts.reduce(0) { $0 + $1.distanceKm }
+        totalMinutes = allWorkouts.reduce(0) { $0 + $1.durationMinutes }
+        
+        // Weekly stats (km and minutes)
+        weeklyDistanceKm = weeklyWorkouts.reduce(0) { $0 + $1.distanceKm }
+        weeklyMinutes = weeklyWorkouts.reduce(0) { $0 + $1.durationMinutes }
+        
+        print("🚴 Total workouts found: \(allWorkouts.count)")
+        print("🚴 Weekly workouts: \(weeklyWorkouts.count)")
+        print("🚴 Workouts: \(allWorkouts.count), Points: \(totalPoints)")
+
     }
     
     // MARK: - Get Workout Distance (iOS 18 compatible)
     private func getWorkoutDistance(_ workout: HKWorkout) -> Double {
-        // Try the new iOS 16+ API first
         if let stats = workout.statistics(for: HKQuantityType(.distanceCycling)) {
             return stats.sumQuantity()?.doubleValue(for: .meterUnit(with: .kilo)) ?? 0
         }
         
-        // Fallback to the older API for older iOS versions
         if let distance = workout.totalDistance {
             return distance.doubleValue(for: .meterUnit(with: .kilo))
         }
@@ -185,13 +258,10 @@ class HealthKitManager: ObservableObject {
     
     // MARK: - Get Workout Calories (iOS 18 compatible)
     private func getWorkoutCalories(_ workout: HKWorkout) -> Double? {
-        // Try the new iOS 16+ API first
         if let stats = workout.statistics(for: HKQuantityType(.activeEnergyBurned)) {
             return stats.sumQuantity()?.doubleValue(for: .kilocalorie())
         }
         
-        // Fallback to the older API for older iOS versions
-        // Using a workaround to avoid deprecation warning
         let energyType = HKQuantityType(.activeEnergyBurned)
         if let allStats = workout.allStatistics[energyType] {
             return allStats.sumQuantity()?.doubleValue(for: .kilocalorie())
@@ -200,15 +270,8 @@ class HealthKitManager: ObservableObject {
         return nil
     }
     
-    // MARK: - Calculate Totals
-    private func calculateTotals() {
-        totalPoints = cyclingWorkouts.reduce(0) { $0 + $1.pointsEarned }
-        totalDistanceKm = cyclingWorkouts.reduce(0) { $0 + $1.distanceKm }
-        totalCO2SavedGrams = cyclingWorkouts.reduce(0) { $0 + $1.co2SavedGrams }
-    }
-    
     // MARK: - Refresh Data
     func refresh() {
-        fetchCyclingWorkouts()
+        fetchAllData()
     }
 }

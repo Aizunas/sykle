@@ -11,7 +11,7 @@ struct PartnersView: View {
     @StateObject private var viewModel = PartnersViewModel()
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Group {
                 if viewModel.isLoading {
                     // Loading state
@@ -77,10 +77,9 @@ struct PartnersView: View {
                             
                             // Partner cards
                             ForEach(viewModel.partners) { partner in
-                                NavigationLink(destination: PartnerDetailView(partnerId: partner.id)) {
+                                NavigationLink(value: partner) {
                                     PartnerCard(partner: partner)
                                 }
-                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(.bottom, 20)
@@ -88,6 +87,32 @@ struct PartnersView: View {
                 }
             }
             .navigationTitle("Partners")
+            .navigationDestination(for: APIPartner.self) { apiPartner in
+                // Map APIPartner to FakePartner so it works with the new PartnerDetailView
+                let fake = fakePartners.first { $0.name == apiPartner.name }
+                    ?? FakePartner(
+                        name: apiPartner.name,
+                        category: apiPartner.category ?? "Coffee",
+                        address: apiPartner.address ?? "",
+                        coordinate: .init(latitude: apiPartner.latitude ?? 51.5228,
+                                          longitude: apiPartner.longitude ?? -0.0755),
+                        openHours: "9:00 AM – 6:00 PM",
+                        pointsCost: 100,
+                        reward: "Reward",
+                        distanceMiles: "Nearby",
+                        syklersVisited: "5+",
+                        weeklyHours: [
+                            1: DayHours(open: "09:00", close: "18:00"),
+                            2: DayHours(open: "09:00", close: "18:00"),
+                            3: DayHours(open: "09:00", close: "18:00"),
+                            4: DayHours(open: "09:00", close: "18:00"),
+                            5: DayHours(open: "09:00", close: "18:00"),
+                            6: DayHours(open: "09:00", close: "18:00"),
+                            7: DayHours(open: "09:00", close: "18:00")
+                        ]
+                    )
+                PartnerDetailView(partner: fake)
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -182,12 +207,12 @@ struct PartnerCard: View {
                     }
                     
                     // Distance (if available)
-                    if let distance = partner.distanceKm {
+                    if let distance = partner.distanceDisplay {
                         HStack(spacing: 4) {
                             Image(systemName: "location.fill")
                                 .font(.system(size: 10))
                                 .foregroundColor(Color("SykleBlue"))
-                            Text("\(String(format: "%.1f", distance)) km")
+                            Text(distance)
                                 .font(.system(size: 12))
                                 .foregroundColor(.gray)
                         }

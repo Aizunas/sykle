@@ -28,7 +28,7 @@ struct WorkoutsListView: View {
                         Text("Syncing workouts...")
                             .foregroundColor(.gray)
                     }
-                } else if healthKitManager.cyclingWorkouts.isEmpty {
+                } else if healthKitManager.allWorkouts.isEmpty {
                     // Empty state
                     VStack(spacing: 16) {
                         Image(systemName: "bicycle")
@@ -60,7 +60,7 @@ struct WorkoutsListView: View {
                         Section {
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text("\(healthKitManager.cyclingWorkouts.count)")
+                                    Text("\(healthKitManager.allWorkouts.count)")
                                         .font(.system(size: 32, weight: .bold))
                                     Text("Total Rides")
                                         .font(.system(size: 14))
@@ -82,8 +82,8 @@ struct WorkoutsListView: View {
                         }
                         
                         // Workouts section
-                        Section(header: Text("Last 30 Days")) {
-                            ForEach(healthKitManager.cyclingWorkouts) { workout in
+                        Section(header: Text("All Rides")) {
+                            ForEach(healthKitManager.allWorkouts) { workout in
                                 WorkoutDetailRow(workout: workout)
                             }
                         }

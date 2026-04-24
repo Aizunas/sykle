@@ -14,8 +14,9 @@ struct SykleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SplashView()
                 .environmentObject(healthKitManager)
+                .preferredColorScheme(.light)
         }
     }
 }

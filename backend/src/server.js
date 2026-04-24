@@ -4,7 +4,7 @@
  * Main entry point for the Express API server
  */
 
-const express = require('express');
+const express = require('express'); // web framework
 const cors = require('cors');
 const path = require('path');
 
@@ -21,9 +21,8 @@ const { initializeDatabase } = require('./database/init');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ===================
+
 // Middleware
-// ===================
 
 // Enable CORS for iOS app to connect
 app.use(cors());
@@ -37,9 +36,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// ===================
+
 // Routes
-// ===================
+
 
 // Health check endpoint
 app.get('/', (req, res) => {
@@ -61,9 +60,8 @@ app.use('/api/rides', rideRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/rewards', rewardRoutes);
 
-// ===================
+
 // Error Handling
-// ===================
 
 // 404 handler
 app.use((req, res) => {
@@ -76,10 +74,8 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
 });
 
-// ===================
-// Start Server
-// ===================
 
+// Start Server
 // Initialize database and start server
 initializeDatabase();
 

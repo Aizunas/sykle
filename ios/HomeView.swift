@@ -2,370 +2,430 @@
 //  HomeView.swift
 //  Sykle
 //
-//  Home screen with points balance and sync functionality
-//
 
 import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var healthKitManager: HealthKitManager
     @StateObject private var userManager = UserManager.shared
-    
+    @ObservedObject private var partnerStore = PartnerStore.shared
     @State private var showingLoginSheet = false
-    @State private var isConnected = false
-    @State private var isCheckingConnection = false
-    
+    @State private var showingBasket = false
+    @ObservedObject private var basket = BasketManager.shared
+    @ObservedObject private var locationManager = LocationManager.shared
+
+    let sykleBlue = Color(red: 88/255, green: 134/255, blue: 185/255)
+
+    // MARK: - Curated partner lists per row
+    // Each row picks specific partners by name, with occasional repeats across rows
+
+    var coffeePartners: [FakePartner] {
+        let names = ["OA Coffee", "Lannan", "Cremerie", "Dayz", "Sede", "Honu", "Latte Club", "OA Coffee", "Cado Cado"]
+        return names.compactMap { name in partnerStore.partners.first { $0.name == name } }
+    }
+
+    var newestPartners: [FakePartner] {
+        let names = ["Browneria", "Aleph", "Petibon", "Fufu", "Varmuteo", "Tio", "Makeroom", "Browneria", "Neulo"]
+        return names.compactMap { name in partnerStore.partners.first { $0.name == name } }
+    }
+
+    var popularPartners: [FakePartner] {
+        let names = ["Been Bakery", "La Joconde", "Rosemund Bakery", "Signorelli Pasticceria", "Honu", "Latte Club", "Been Bakery", "Browneria"]
+        return names.compactMap { name in partnerStore.partners.first { $0.name == name } }
+    }
+
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    
-                    // Connection warning
-                    if !isConnected && userManager.isLoggedIn {
-                        ConnectionBanner(isChecking: $isCheckingConnection) {
-                            checkConnection()
-                        }
-                    }
-                    
-                    // Login prompt
-                    if !userManager.isLoggedIn {
-                        LoginPromptCard {
-                            showingLoginSheet = true
-                        }
-                    }
-                    
-                    // Points Balance
-                    PointsBalanceCard(
-                        points: userManager.isLoggedIn ? userManager.serverPoints : healthKitManager.totalPoints,
-                        isLoggedIn: userManager.isLoggedIn
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 24) {
+
+                    WalletCard(
+                        points: userManager.isLoggedIn
+                            ? userManager.serverPoints
+                            : healthKitManager.totalPoints
                     )
-                    
-                    // Sync Button
-                    if userManager.isLoggedIn {
-                        SyncButton(
-                            isSyncing: userManager.isSyncing,
-                            lastResult: userManager.lastSyncResult
-                        ) {
-                            Task {
-                                await userManager.syncRides(workouts: healthKitManager.cyclingWorkouts)
-                            }
-                        }
-                    }
-                    
-                    // Stats Row
-                    HStack(spacing: 16) {
-                        StatCard(
-                            icon: "leaf.fill",
-                            value: formatCO2(userManager.isLoggedIn ? userManager.serverCO2SavedG : healthKitManager.totalCO2SavedGrams),
-                            label: "CO₂ Saved",
-                            color: .green
-                        )
-                        
-                        StatCard(
-                            icon: "bicycle",
-                            value: String(format: "%.1f km", userManager.isLoggedIn ? userManager.serverDistanceKm : healthKitManager.totalDistanceKm),
-                            label: "Distance",
-                            color: Color("SykleBlue")
-                        )
-                        
-                        StatCard(
-                            icon: "flame.fill",
-                            value: "\(healthKitManager.cyclingWorkouts.count)",
-                            label: "Rides",
-                            color: .orange
-                        )
-                    }
-                    .padding(.horizontal)
-                    
-                    // Error message
-                    if let error = userManager.errorMessage {
-                        ErrorBanner(message: error)
-                    }
-                    
-                    // Recent rides
-                    if !healthKitManager.cyclingWorkouts.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Recent Activity")
-                                .font(.system(size: 18, weight: .semibold))
-                                .padding(.horizontal)
-                            
-                            ForEach(healthKitManager.cyclingWorkouts.prefix(3)) { workout in
-                                WorkoutRow(workout: workout)
-                                    .padding(.horizontal)
-                            }
-                        }
-                    }
-                    
+
+                    FeaturedRewardSection(partnerStore: partnerStore)
+
+                    HomePartnerRow(
+                        title: "Coffee shops nearby",
+                        partners: coffeePartners,
+                        filterTitle: "Coffee shops nearby"
+                    )
+                    HomePartnerRow(
+                        title: "Newest partners",
+                        partners: newestPartners,
+                        filterTitle: "Newest partners"
+                    )
+                    HomePartnerRow(
+                        title: "Most popular partners",
+                        partners: popularPartners,
+                        filterTitle: "Most popular partners"
+                    )
+
                     Spacer(minLength: 20)
                 }
-                .padding(.top)
+                .padding(.top, 8)
             }
-            .background(Color(UIColor.systemGroupedBackground))
-            .navigationTitle("sykle.")
+            .background(Color(UIColor.systemBackground))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { healthKitManager.refresh() }) {
-                        Image(systemName: "arrow.clockwise")
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Text("sykle.")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(sykleBlue)
+                        .fixedSize()
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: FavouritesView()) {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(Color(red: 254/255, green: 217/255, blue: 3/255))
+                            .font(.system(size: 20))
+                    }
+                    Button(action: { showingBasket = true }) {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "cart")
+                                .foregroundColor(.black)
+                                .font(.system(size: 20))
+                            if !basket.items.isEmpty {
+                                Circle()
+                                    .fill(Color(red: 88/255, green: 134/255, blue: 185/255))
+                                    .frame(width: 10, height: 10)
+                                    .offset(x: 4, y: -4)
+                            }
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showingLoginSheet) {
                 LoginSheet()
             }
+            .sheet(isPresented: $showingBasket) {
+                BasketView()
+            }
+            .task {
+                if !partnerStore.hasLoaded {
+                    await partnerStore.loadPartners()
+                }
+                // Reposition after loading
+                if let location = locationManager.userLocation {
+                    partnerStore.repositionPartners(around: location)
+                }
+            }
             .onAppear {
-                checkConnection()
-            }
-        }
-    }
-    
-    private func formatCO2(_ grams: Double) -> String {
-        if grams >= 1000 {
-            return String(format: "%.1f kg", grams / 1000)
-        }
-        return String(format: "%.0fg", grams)
-    }
-    
-    private func checkConnection() {
-        isCheckingConnection = true
-        Task {
-            let connected = await NetworkManager.shared.checkConnection()
-            await MainActor.run {
-                isConnected = connected
-                isCheckingConnection = false
-            }
-        }
-    }
-}
-
-// MARK: - Supporting Views
-
-struct LoginPromptCard: View {
-    let onLogin: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "person.crop.circle.badge.plus")
-                .font(.system(size: 40))
-                .foregroundColor(Color("SykleBlue"))
-            
-            Text("Sign in to sync your rides")
-                .font(.system(size: 16, weight: .medium))
-            
-            Text("Save your points to the cloud and redeem rewards")
-                .font(.system(size: 14))
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-            
-            Button(action: onLogin) {
-                Text("Sign In")
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 12)
-                    .background(Color("SykleBlue"))
-                    .cornerRadius(10)
-            }
-            .padding(.top, 8)
-        }
-        .padding(20)
-        .background(Color.white)
-        .cornerRadius(16)
-        .padding(.horizontal)
-    }
-}
-
-struct ConnectionBanner: View {
-    @Binding var isChecking: Bool
-    let onRetry: () -> Void
-    
-    var body: some View {
-        HStack {
-            Image(systemName: "wifi.slash")
-                .foregroundColor(.orange)
-            Text("Cannot connect to server")
-                .font(.system(size: 14))
-            Spacer()
-            if isChecking {
-                ProgressView().scaleEffect(0.8)
-            } else {
-                Button("Retry", action: onRetry)
-                    .font(.system(size: 14, weight: .medium))
-            }
-        }
-        .padding()
-        .background(Color.orange.opacity(0.1))
-        .cornerRadius(10)
-        .padding(.horizontal)
-    }
-}
-
-struct ErrorBanner: View {
-    let message: String
-    
-    var body: some View {
-        HStack {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundColor(.red)
-            Text(message)
-                .font(.system(size: 14))
-                .foregroundColor(.red)
-            Spacer()
-        }
-        .padding()
-        .background(Color.red.opacity(0.1))
-        .cornerRadius(10)
-        .padding(.horizontal)
-    }
-}
-
-struct SyncButton: View {
-    let isSyncing: Bool
-    let lastResult: String?
-    let onSync: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Button(action: onSync) {
-                HStack {
-                    if isSyncing {
-                        ProgressView().tint(.white)
-                    } else {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                    }
-                    Text(isSyncing ? "Syncing..." : "Sync Rides to Cloud")
-                        .fontWeight(.medium)
+                if let location = locationManager.userLocation {
+                    partnerStore.repositionPartners(around: location)
                 }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(isSyncing ? Color.gray : Color("SykleBlue"))
-                .cornerRadius(12)
             }
-            .disabled(isSyncing)
-            
-            if let result = lastResult {
-                Text(result)
-                    .font(.system(size: 12))
-                    .foregroundColor(.green)
+            .onChange(of: locationManager.userLocation?.latitude) { _ in
+                guard let location = locationManager.userLocation else { return }
+                // Only reposition if partners are already loaded
+                guard partnerStore.hasLoaded else { return }
+                partnerStore.repositionPartners(around: location)
             }
         }
-        .padding(.horizontal)
     }
 }
 
-struct PointsBalanceCard: View {
+// MARK: - Wallet Card
+
+struct WalletCard: View {
     let points: Int
-    let isLoggedIn: Bool
-    
+    let sykleBlue = Color(red: 88/255, green: 134/255, blue: 185/255)
+
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Wallet")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(.black)
+                .padding(.horizontal, 16)
+
+            NavigationLink(destination: WalletView()) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(sykleBlue)
+
+                    HStack(spacing: 16) {
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.white)
+                            .frame(width: 190, height: 80)
+                            .overlay(
+                                HStack(spacing: 12) {
+                                    Image("SykleLogo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 48, height: 48)
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        Text("\(points)")
+                                            .font(.system(size: 28, weight: .bold))
+                                            .foregroundColor(.black)
+                                        Text("sykles")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            )
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 20)
+                }
+                .frame(height: 120)
+                .padding(.horizontal, 16)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(height: 120)
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
+// MARK: - Featured Reward Section
+
+struct FeaturedRewardSection: View {
+    @ObservedObject var partnerStore: PartnerStore
+    let sykleYellow = Color(red: 254/255, green: 217/255, blue: 3/255)
+
+    // Pick a featured partner+reward combo that changes daily
+    var featured: (partner: FakePartner, reward: FakeReward)? {
+        // Only consider free item rewards under 6000 sykles
+        let eligible = partnerStore.partners.compactMap { partner -> (FakePartner, FakeReward)? in
+            let rewards = PartnerStore.shared.getRewards(for: partner.name)
+            let goodReward = rewards.first {
+                $0.name.lowercased().contains("free") && $0.syklesCost <= 6000
+            }
+            guard let reward = goodReward else { return nil }
+            return (partner, reward)
+        }
+
+        guard !eligible.isEmpty else { return nil }
+
+        // Use day of year as seed so it changes daily but stays consistent within a day
+        let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
+        let index = dayOfYear % eligible.count
+        return eligible[index]
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "star.fill")
+                    .foregroundColor(sykleYellow)
+                    .font(.system(size: 18))
+                Text("Featured reward")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.black)
+            }
+            .padding(.horizontal, 16)
+
+            if let featured = featured {
+                let imageName = featured.partner.name
+                    .lowercased()
+                    .replacingOccurrences(of: " ", with: "_")
+                    .replacingOccurrences(of: "'", with: "")
+
+                NavigationLink(destination: PartnerDetailView(partner: featured.partner)) {
+                    HStack(spacing: 0) {
+                        ZStack {
+                            Rectangle().fill(Color.gray.opacity(0.2))
+                            Image(imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        }
+                        .frame(width: 120, height: 100)
+                        .clipped()
+                        .cornerRadius(12, corners: [.topLeft, .bottomLeft])
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(featured.partner.name.uppercased())
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.black)
+                                .lineLimit(1)
+                            Text(featured.reward.name.uppercased())
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.black)
+                            HStack(spacing: 6) {
+                                Image("SykleLogo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                                Text("\(featured.reward.syklesCost) sykles")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.black)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .overlay(Capsule().stroke(Color.gray.opacity(0.4), lineWidth: 1))
+                        }
+                        .padding(.horizontal, 16)
+                        Spacer()
+                    }
+                    .frame(height: 100)
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                    .shadow(color: .black.opacity(0.05), radius: 6, x: 0, y: 2)
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+    }
+}
+// MARK: - Horizontal Partner Row (Looping)
+
+struct HomePartnerRow: View {
+    let title: String
+    let partners: [FakePartner]
+    let filterTitle: String
+
+    // Multiply partners to create infinite loop illusion
+    private var loopedPartners: [LoopedPartner] {
+        guard !partners.isEmpty else { return [] }
+        // Repeat 3 times so user can scroll in either direction
+        return (0..<3).flatMap { cycle in
+            partners.map { LoopedPartner(id: "\(cycle)-\($0.id)", partner: $0) }
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
+                Text(title)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.black)
                 Spacer()
-                if isLoggedIn {
-                    Image(systemName: "checkmark.icloud.fill")
-                        .foregroundColor(.white.opacity(0.8))
-                        .font(.system(size: 14))
+                NavigationLink(destination: FilteredPartnersView(title: title, partners: partners)) {
+                    Image(systemName: "arrow.right")
+                        .foregroundColor(.black)
+                        .font(.system(size: 16, weight: .medium))
                 }
             }
-            .padding(.horizontal, 8)
-            
-            Text("Your Balance")
-                .font(.system(size: 14))
-                .foregroundColor(.white.opacity(0.8))
-            
-            Text("\(points)")
-                .font(.system(size: 48, weight: .bold))
-                .foregroundColor(.white)
-            
-            Text("sykles")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.white.opacity(0.8))
-            
-            if !isLoggedIn {
-                Text("(local only)")
-                    .font(.system(size: 12))
-                    .foregroundColor(.white.opacity(0.6))
+            .padding(.horizontal, 16)
+
+            LoopingCarousel(items: loopedPartners, startIndex: partners.count)
+        }
+    }
+}
+
+// MARK: - Looped Partner wrapper (unique ID per loop cycle)
+
+struct LoopedPartner: Identifiable {
+    let id: String
+    let partner: FakePartner
+}
+
+// MARK: - Looping Carousel
+
+struct LoopingCarousel: View {
+    let items: [LoopedPartner]
+    let startIndex: Int
+
+    @State private var scrollOffset: CGFloat = 0
+    private let cardWidth: CGFloat = 160
+    private let cardSpacing: CGFloat = 12
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: cardSpacing) {
+                    ForEach(items) { item in
+                        NavigationLink(destination: PartnerDetailView(partner: item.partner)) {
+                            HomePartnerCard(partner: item.partner)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .id(item.id)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 4)
+            }
+            .onAppear {
+                // Start in the middle copy so user can scroll both ways
+                if startIndex < items.count {
+                    proxy.scrollTo(items[startIndex].id, anchor: .leading)
+                }
             }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 30)
-        .background(
-            LinearGradient(
-                colors: [Color("SykleBlue"), Color("SykleBlue").opacity(0.8)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .cornerRadius(20)
-        .padding(.horizontal)
     }
 }
 
-struct StatCard: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(color)
-            Text(value)
-                .font(.system(size: 16, weight: .bold))
-            Text(label)
-                .font(.system(size: 12))
-                .foregroundColor(.gray)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color.white)
-        .cornerRadius(12)
-    }
-}
+// MARK: - Home Partner Card
 
-struct WorkoutRow: View {
-    let workout: CyclingWorkout
-    
+struct HomePartnerCard: View {
+    let partner: FakePartner
+
+    private var imageName: String {
+        partner.name.lowercased()
+            .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: "'", with: "")
+    }
+
     var body: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
             ZStack {
-                Circle()
-                    .fill(Color("SykleBlue").opacity(0.1))
-                    .frame(width: 44, height: 44)
-                Image(systemName: "bicycle")
-                    .foregroundColor(Color("SykleBlue"))
+                Rectangle().fill(Color.gray.opacity(0.15))
+                Image(imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
             }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(formatDate(workout.startDate))
-                    .font(.system(size: 14, weight: .medium))
-                Text("\(String(format: "%.1f", workout.distanceKm)) km • \(Int(workout.durationMinutes)) min")
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
+            .frame(width: 160, height: 130)
+            .clipped()
+            .cornerRadius(12)
+
+            Text(partner.name.uppercased())
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.black)
+                .lineLimit(1)
+                .frame(width: 160, alignment: .leading)
+
+            Text(partner.distanceMiles)
+                .font(.system(size: 11))
+                .foregroundColor(.gray)
+                .frame(width: 160, alignment: .leading)
+
+            HStack(spacing: 6) {
+                Text("\(partner.syklersVisited) syklers visited")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 7).padding(.vertical, 4)
+                    .background(Color.sykleLight)
+                    .cornerRadius(20)
+
+                Text(partner.isOpen ? "Open" : "Closed")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 7).padding(.vertical, 4)
+                    .background(partner.isOpen ? Color.sykleGreen : Color.syklePink)
+                    .cornerRadius(20)
             }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing) {
-                Text("+\(workout.pointsEarned)")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color("SykleBlue"))
-                Text("sykles")
-                    .font(.system(size: 10))
-                    .foregroundColor(.gray)
-            }
+            .frame(width: 160, alignment: .leading)
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
     }
-    
-    func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+}
+
+// MARK: - Corner Radius Helper
+
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape(RoundedCorner(radius: radius, corners: corners))
     }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
+    }
+}
+
+#Preview {
+    HomeView()
+        .environmentObject(HealthKitManager())
 }
