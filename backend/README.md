@@ -34,8 +34,8 @@ npm run dev
 You should see:
 ```
 ========================================
-🚴 Sykle API Server running on port 3000
-📍 http://localhost:3000
+Sykle API Server running on port 3000
+http://localhost:3000
 ========================================
 ```
 
@@ -109,10 +109,3 @@ Example: 5km, 30 minutes = 500 + 300 = 800 sykles
 2. Use `http://YOUR_IP:3000` as API base URL in iOS app
 3. Example: `http://192.168.1.100:3000/api`
 
-## Sample Data
-
-Pre-loaded with 4 cafes and 8 rewards. View them:
-```bash
-curl http://localhost:3000/api/partners
-curl http://localhost:3000/api/rewards
-```
