@@ -1,7 +1,7 @@
 # 🚴 Sykle — Test Account
 
 ## Backend
-The backend is hosted via ngrok. URL changes if the server restarts — contact the developer for the latest URL.
+The backend is hosted via ngrok. URL changes if the server restarts — contact for the latest URL.
 
 ## Test Credentials
 | Field | Value |
@@ -26,4 +26,4 @@ The backend is hosted via ngrok. URL changes if the server restarts — contact 
 ## Notes
 - The app requires an iPhone running iOS 16 or later
 - Location permissions are needed for the map to show partners near you
-- The backend must be running for the app to work — contact the developer if you see connection errors
+- The backend must be running for the app to work — contact if you see connection errors
