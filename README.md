@@ -149,7 +149,7 @@ This account is pre-loaded with **50,000 sykles** so you can test the full redem
 - Requires iPhone running iOS 16 or later
 - Location permission needed for the map
 - Health data won't sync on the test account (no real cycling workouts) — create your own account and add cycling workouts via the Health app to test syncing
-- Backend must be running — contact the developer if you see connection errors
+- Backend must be running — contact if you see connection errors
 
 ---
 
