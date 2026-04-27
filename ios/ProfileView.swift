@@ -279,7 +279,7 @@ struct ProfileView: View {
     
     private func performLogout() {
         UserManager.shared.clearUser()
-        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+        //UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
     }
 }
 

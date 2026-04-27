@@ -380,6 +380,7 @@ struct EmailLoginSheet: View {
             // When sign in succeeds, show the welcome/onboarding flow
             .fullScreenCover(isPresented: $showWelcome) {
                 WelcomeView(onComplete: {
+                    UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
                     showWelcome = false
                     isAuthenticated = true
                     dismiss()
