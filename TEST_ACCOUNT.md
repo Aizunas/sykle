@@ -6,7 +6,7 @@ The backend is hosted via ngrok. URL changes if the server restarts — contact 
 ## Test Credentials
 | Field | Value |
 |-------|-------|
-| Email | tester@sykle.app |
+| Email | sykletester@gmail.com |
 | Password | Sykle2026 |
 
 ## What to test
