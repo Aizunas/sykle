@@ -76,11 +76,20 @@ struct FilledBasketView: View {
     @ObservedObject private var basket = BasketManager.shared
     @ObservedObject private var voucherStore = VoucherStore.shared
     @State private var activeVoucher: SavedVoucher? = nil
+    @StateObject private var userManager = UserManager.shared
+    
 
-    let currentSykles = 12578
     let sykleBlue = Color(red: 88/255, green: 134/255, blue: 185/255)
     let cardBlue = Color(red: 173/255, green: 210/255, blue: 235/255)
 
+    var currentSykles: Int {
+        userManager.serverPoints
+    }
+    
+    var hasEnoughSykles: Bool {
+        currentSykles >= basket.totalSykles
+    }
+    
     var syklesAfterRedemption: Int {
         max(0, currentSykles - basket.totalSykles)
     }
@@ -90,7 +99,8 @@ struct FilledBasketView: View {
     }
     
     var canRedeem: Bool {
-        partner?.isCurrentlyOpen ?? false
+        //(partner?.isCurrentlyOpen ?? false) &&
+        hasEnoughSykles
     }
 
     var closingTimeString: String {
@@ -206,28 +216,56 @@ struct FilledBasketView: View {
                         if let partner = partner {
                             let voucherPartner = VoucherPartner(name: partner.name, distanceMiles: partner.distanceMiles)
                             let expiry = partner.closingTimeToday ?? Date().addingTimeInterval(15 * 60)
+                            
+                            // Convert basket items to voucher items
+                            let voucherItems = basket.items.map {
+                                VoucherItem(
+                                    name: $0.reward.name,
+                                    quantity: $0.quantity,
+                                    syklesCost: $0.reward.syklesCost * $0.quantity
+                                )
+                            }
+                            
                             let voucher = SavedVoucher(
                                 partners: [voucherPartner],
                                 totalSykles: basket.totalSykles,
-                                validUntil: expiry
+                                validUntil: expiry,
+                                items: voucherItems
                             )
                             voucherStore.save(voucher: voucher)
                             activeVoucher = voucher
+                            
+                            // Deduct points from backend and refresh
+                            Task {
+                                await UserManager.shared.refreshUser()
+                            }
                         }
                     }
                 )
                 .padding(.top, 8)
 
                 if !canRedeem {
-                    HStack(spacing: 6) {
-                        Image(systemName: "clock.badge.xmark")
-                            .font(.system(size: 12))
-                            .foregroundColor(.red)
-                        Text("Redemption unavailable outside opening hours")
-                            .font(.system(size: 12))
-                            .foregroundColor(.red)
+                    if !(partner?.isCurrentlyOpen ?? false) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "clock.badge.xmark")
+                                .font(.system(size: 12))
+                                .foregroundColor(.red)
+                            Text("Redemption unavailable outside opening hours")
+                                .font(.system(size: 12))
+                                .foregroundColor(.red)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    } else if !hasEnoughSykles {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.circle")
+                                .font(.system(size: 12))
+                                .foregroundColor(.red)
+                            Text("You need \(basket.totalSykles - currentSykles) more sykles to redeem")
+                                .font(.system(size: 12))
+                                .foregroundColor(.red)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
                 } else {
                     Text("Voucher valid until \(closingTimeString)")
                         .font(.system(size: 12))

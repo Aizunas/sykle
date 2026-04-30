@@ -45,7 +45,7 @@ function dbAll(sql, params = []) {
 }
 
 async function initializeDatabase() {
-    console.log('📦 Initializing database...');
+    console.log('Initializing database...');
     const db = getDatabase();
 
     db.serialize(() => {
@@ -111,15 +111,15 @@ async function initializeDatabase() {
         db.get('SELECT COUNT(*) as count FROM partners', [], (err, row) => {
             if (err) { console.error('Error checking partners:', err); return; }
             if (row.count === 0) {
-                console.log('📝 Adding partners and rewards...');
+                console.log('Adding partners and rewards...');
                 addSampleData(db);
             } else {
-                console.log('📊 Database has ' + row.count + ' partners');
+                console.log('Database has ' + row.count + ' partners');
             }
         });
     });
 
-    console.log('✅ Database initialized successfully');
+    console.log('Database initialized successfully');
     return db;
 }
 
@@ -202,7 +202,7 @@ function addSampleData(db) {
     rewards.forEach(r => insertReward.run([r.id, r.partner_id, r.name, r.points_cost, r.category]));
     insertReward.finalize();
 
-    console.log('✅ Added ' + partners.length + ' partners and ' + rewards.length + ' rewards');
+    console.log('Added ' + partners.length + ' partners and ' + rewards.length + ' rewards');
 }
 
 module.exports = { getDatabase, initializeDatabase, dbRun, dbGet, dbAll };

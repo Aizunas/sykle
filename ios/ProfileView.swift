@@ -1144,7 +1144,7 @@ struct FAQsView: View {
         ("How do I redeem a reward?",
          "Browse partner cafés and bakeries on the Map or Home screen, tap a partner to see their available rewards, add one to your basket, and swipe to generate a voucher. Show the QR code to staff at the counter."),
         ("How long is a voucher valid for?",
-         "Vouchers are valid for 15 minutes from the moment you generate them. Make sure you're at the partner location before swiping to redeem."),
+         "Vouchers are valid until the partner closes on the day you redeem them. You can only generate a voucher during a partner's opening hours, so make sure you're at the location before swiping."),
         ("Why aren't my rides syncing?",
          "Make sure Sykle has access to your Health data. Go to Profile → Health integrations to check. If permissions look correct, tap 'Sync now' on your profile page to manually trigger a sync."),
         ("Can I use sykles at any café?",

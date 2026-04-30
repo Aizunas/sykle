@@ -81,8 +81,8 @@ initializeDatabase();
 
 app.listen(PORT, () => {
     console.log('========================================');
-    console.log(`🚴 Sykle API Server running on port ${PORT}`);
-    console.log(`📍 http://localhost:${PORT}`);
+    console.log(`Sykle API Server running on port ${PORT}`);
+    console.log(`http://localhost:${PORT}`);
     console.log('========================================');
     console.log('Available endpoints:');
     console.log('  GET    /                     - API info');

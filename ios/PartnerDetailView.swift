@@ -382,9 +382,9 @@ struct InfoOverlay: View {
                 .padding(.top, 4)
 
                 VStack(spacing: 10) {
-                    InfoStep(number: 1, text: "Add products to your basket")
-                    InfoStep(number: 2, text: "Swipe to use your sykles and unlock the reward")
-                    InfoStep(number: 3, text: "Show the QR code to staff and pay the remaining balance. The voucher expires after 15 minutes")
+                    InfoStep(number: 1, text: "Add rewards to your basket")
+                    InfoStep(number: 2, text: "Swipe to use your sykles and generate a voucher")
+                    InfoStep(number: 3, text: "Show the QR code to staff — voucher is valid until the partner closes today")
                 }
 
                 Button(action: onDismiss) {

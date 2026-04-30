@@ -136,6 +136,59 @@ struct VoucherView: View {
                     .background(Color.white)
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 2)
+                    
+                    // Order summary
+                    if !voucher.items.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Your order")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+
+                            VStack(spacing: 0) {
+                                ForEach(voucher.items, id: \.name) { item in
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(item.name)
+                                                .font(.system(size: 14, weight: .medium))
+                                                .foregroundColor(.black)
+                                            if item.quantity > 1 {
+                                                Text("×\(item.quantity)")
+                                                    .font(.system(size: 12))
+                                                    .foregroundColor(.gray)
+                                            }
+                                        }
+                                        Spacer()
+                                        HStack(spacing: 4) {
+                                            Image("SykleLogo")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 14, height: 14)
+                                            Text("\(item.syklesCost)")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.black)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(Color(red: 173/255, green: 210/255, blue: 235/255).opacity(0.4))
+                                        .cornerRadius(20)
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
+                                    if item.name != voucher.items.last?.name {
+                                        Divider().padding(.horizontal, 16)
+                                    }
+                                }
+                            }
+                            .padding(.bottom, 16)
+                        }
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 2)
+                    }
+                    
+                    
 
                     // Expiry warning
                     if !voucher.isExpired {
@@ -144,10 +197,10 @@ struct VoucherView: View {
                                 .font(.system(size: 24))
                                 .foregroundColor(.black)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Expires in 15 minutes")
+                                Text("Voucher expires today")
                                     .font(.system(size: 15, weight: .bold))
                                     .foregroundColor(.black)
-                                Text("Make sure to redeem before \(voucher.validUntilString)")
+                                Text("Valid \(voucher.validUntilString)")
                                     .font(.system(size: 13))
                                     .foregroundColor(.gray)
                             }

@@ -7,7 +7,7 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var healthKitManager: HealthKitManager
-    @StateObject private var userManager = UserManager.shared
+    @ObservedObject private var userManager = UserManager.shared
     @ObservedObject private var partnerStore = PartnerStore.shared
     @State private var showingLoginSheet = false
     @State private var showingBasket = false
@@ -281,9 +281,8 @@ struct HomePartnerRow: View {
     // Multiply partners to create infinite loop illusion
     private var loopedPartners: [LoopedPartner] {
         guard !partners.isEmpty else { return [] }
-        // Repeat 3 times so user can scroll in either direction
         return (0..<3).flatMap { cycle in
-            partners.map { LoopedPartner(id: "\(cycle)-\($0.id)", partner: $0) }
+            partners.map { LoopedPartner(id: "\(cycle)-\($0.name)", partner: $0) }
         }
     }
 
