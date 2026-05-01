@@ -15,7 +15,7 @@ const partnerRoutes = require('./routes/partnerRoutes');
 const rewardRoutes = require('./routes/rewardRoutes');
 
 // Import database initialization
-const { initializeDatabase } = require('./database/init');
+require('./database/pg');
 
 // Create Express app
 const app = express();
@@ -77,7 +77,7 @@ app.use((err, req, res, next) => {
 
 // Start Server
 // Initialize database and start server
-initializeDatabase();
+
 
 app.listen(PORT, () => {
     console.log('========================================');
