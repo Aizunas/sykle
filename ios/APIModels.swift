@@ -20,8 +20,20 @@ struct APIUser: Codable {
     let totalDistanceKm: Double
     let totalCO2SavedG: Double
     let availablePoints: Int?
-    
-    // Computed property for display name
+    let totalMinutes: Int?  // add this
+
+    enum CodingKeys: String, CodingKey {
+        case id, email
+        case firstName = "firstName"
+        case lastName = "lastName"
+        case fullName = "fullName"
+        case totalPoints = "totalPoints"
+        case totalDistanceKm = "totalDistanceKm"
+        case totalCO2SavedG = "totalCO2SavedG"
+        case availablePoints = "available_points"
+        case totalMinutes = "total_minutes"  // add this
+    }
+
     var displayName: String {
         if let full = fullName, !full.isEmpty { return full }
         if let first = firstName { return first }
@@ -66,6 +78,8 @@ struct SyncRidesSummary: Codable {
     let newRidesSynced: Int
     let pointsEarned: Int
     let co2SavedGrams: Int
+    let distanceSynced: Double?
+    let minutesSynced: Int?
 }
 
 struct SyncRidesUserInfo: Codable {

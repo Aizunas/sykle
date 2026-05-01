@@ -37,10 +37,6 @@ struct ProfileView: View {
         let needed = minRewardCost - currentPoints
         return max(0, needed)
     }
-
-    var totalMinutes: Int {
-        Int(healthKitManager.weeklyMinutes)
-    }
     
     var userName: String {
         userManager.currentUser?.displayName ?? "Cyclist"
@@ -67,7 +63,6 @@ struct ProfileView: View {
                     StatsSection(
                         currentPoints: currentPoints,
                         pointsToNextReward: pointsToNextReward,
-                        totalMinutes: totalMinutes
                     )
 
                     // MARK: Account
@@ -615,7 +610,6 @@ struct StatsSection: View {
     @StateObject private var userManager = UserManager.shared
     let currentPoints: Int
     let pointsToNextReward: Int
-    let totalMinutes: Int
     
     let sykleBlue = Color.sykleMid
     let sykleNavy = Color.sykleNavy
@@ -645,7 +639,7 @@ struct StatsSection: View {
                 RoundedRectangle(cornerRadius: 16)
                     .fill(cardBlue)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(formatCO2(healthKitManager.totalCO2SavedGrams))
+                    Text(formatCO2(userManager.serverCO2SavedG))
                         .font(.system(size: 36, weight: .bold))
                         .foregroundColor(.white)
                     HStack(spacing: 4) {
@@ -730,7 +724,7 @@ struct StatsSection: View {
 
             // Distance
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(String(format: "%.1f", healthKitManager.totalDistanceKm))
+                Text(String(format: "%.1f", userManager.serverDistanceKm))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.black)
                 Text("km")
@@ -744,7 +738,7 @@ struct StatsSection: View {
 
             // Minutes
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text("\(totalMinutes)")
+                Text("\(userManager.serverMinutes)")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.black)
                 Text("mins")
@@ -1236,7 +1230,7 @@ struct TermsAndConditionsView: View {
                 
                 LegalSection(title: "4. Earning Sykles", content: "Sykles are awarded based on verified cycling activity data retrieved from Apple Health. Points are calculated using our standard formula: 100 sykles per kilometre plus 10 sykles per minute. Sykle reserves the right to adjust the points formula at any time with reasonable notice.")
                 
-                LegalSection(title: "5. Redeeming Rewards", content: "Rewards can only be redeemed at participating partner businesses listed in the app. Vouchers are valid for 15 minutes from generation and cannot be reissued once expired. Sykle is not responsible for a partner business refusing or being unable to honour a reward.")
+                LegalSection(title: "5. Redeeming Rewards", content: "Rewards can only be redeemed at participating partner businesses listed in the app. Vouchers are valid until the partner closes on the day of redemption and can only be generated during opening hours. Sykle is not responsible for a partner business refusing or being unable to honour a reward.")
                 
                 LegalSection(title: "6. Partner Businesses", content: "Partner businesses are independent third parties. Sykle does not guarantee the quality, availability, or continued participation of any partner. Partners may be added or removed from the platform at any time.")
                 

@@ -50,7 +50,21 @@ exports.getUser = async (req, res) => {
             FROM redemptions WHERE user_id = ? AND status IN ('pending', 'completed')
         `, [id]);
 
-        res.json({ user: { ...formatUser(user), available_points: user.total_points - spentPoints.total } });
+        // Add this — get total minutes from rides
+        const rideStats = await dbGet(`
+            SELECT COALESCE(SUM(duration_minutes), 0) as total_minutes
+            FROM rides WHERE user_id = ?
+        `, [id]);
+
+        const availablePoints = user.total_points - spentPoints.total;
+
+        res.json({
+            user: {
+                ...formatUser(user),
+                available_points: availablePoints,
+                total_minutes: Math.round(rideStats.total_minutes)
+            }
+        });
     } catch (error) {
         console.error('Error getting user:', error);
         res.status(500).json({ error: 'Failed to get user' });

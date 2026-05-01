@@ -214,34 +214,43 @@ struct FilledBasketView: View {
                     isEnabled: canRedeem,
                     onComplete: {
                         if let partner = partner {
-                            let voucherPartner = VoucherPartner(name: partner.name, distanceMiles: partner.distanceMiles)
-                            let expiry = partner.closingTimeToday ?? Date().addingTimeInterval(15 * 60)
-                            
-                            // Convert basket items to voucher items
-                            let voucherItems = basket.items.map {
-                                VoucherItem(
-                                    name: $0.reward.name,
-                                    quantity: $0.quantity,
-                                    syklesCost: $0.reward.syklesCost * $0.quantity
-                                )
-                            }
-                            
-                            let voucher = SavedVoucher(
-                                partners: [voucherPartner],
-                                totalSykles: basket.totalSykles,
-                                validUntil: expiry,
-                                items: voucherItems
-                            )
-                            voucherStore.save(voucher: voucher)
-                            activeVoucher = voucher
-                            
-                            // Deduct points from backend and refresh
                             Task {
+                                // Call backend to deduct points for each item
+                                for item in basket.items {
+                                    if let apiId = item.reward.apiId {
+                                        if let userId = UserManager.shared.currentUser?.id {
+                                            _ = try? await NetworkManager.shared.redeemReward(
+                                                userId: userId,
+                                                rewardId: apiId
+                                            )
+                                        }
+                                    }
+                                }
+                                
+                                // Create voucher locally
+                                let voucherPartner = VoucherPartner(name: partner.name, distanceMiles: partner.distanceMiles)
+                                let expiry = partner.closingTimeToday ?? Date().addingTimeInterval(15 * 60)
+                                let voucherItems = basket.items.map {
+                                    VoucherItem(name: $0.reward.name, quantity: $0.quantity, syklesCost: $0.reward.syklesCost * $0.quantity)
+                                }
+                                let voucher = SavedVoucher(
+                                    partners: [voucherPartner],
+                                    totalSykles: basket.totalSykles,
+                                    validUntil: expiry,
+                                    items: voucherItems
+                                )
+                                voucherStore.save(voucher: voucher)
+                                activeVoucher = voucher
+                                
+                                // Refresh points
                                 await UserManager.shared.refreshUser()
+                                
                             }
                         }
                     }
-                )
+                    
+                    )
+                        
                 .padding(.top, 8)
 
                 if !canRedeem {

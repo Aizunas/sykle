@@ -21,9 +21,12 @@ class UserManager: ObservableObject {
     
     // Points from server (more accurate than local)
     @Published var serverPoints: Int = 0
+    @Published var serverMinutes: Int = 0
     @Published var serverDistanceKm: Double = 0
     @Published var serverCO2SavedG: Double = 0
     @Published var lastSyncPoints: Int = UserDefaults.standard.integer(forKey: "sykle_last_sync_points")
+    @Published var lastSyncDistanceKm: Double = UserDefaults.standard.double(forKey: "sykle_last_sync_distance")
+    @Published var lastSyncMinutes: Int = UserDefaults.standard.integer(forKey: "sykle_last_sync_minutes")
     
     // MARK: - Private Properties
     
@@ -69,7 +72,7 @@ class UserManager: ObservableObject {
             await MainActor.run {
                 self.currentUser = user
                 self.isLoggedIn = true
-                self.serverPoints = user.totalPoints
+                self.serverPoints = user.availablePoints ?? user.totalPoints
                 self.serverDistanceKm = user.totalDistanceKm
                 self.serverCO2SavedG = user.totalCO2SavedG
                 self.errorMessage = nil
@@ -104,9 +107,11 @@ class UserManager: ObservableObject {
                 await MainActor.run {
                     self.currentUser = user
                     self.isLoggedIn = true
-                    self.serverPoints = user.totalPoints
+                    self.serverPoints = user.availablePoints ?? user.totalPoints
                     self.serverDistanceKm = user.totalDistanceKm
                     self.serverCO2SavedG = user.totalCO2SavedG
+                    self.serverMinutes = user.totalMinutes ?? 0
+                    
                 }
                 
                 print("✅ Loaded user: \(user.email)")
@@ -149,21 +154,24 @@ class UserManager: ObservableObject {
             
             await MainActor.run {
                 self.isSyncing = false
-                self.serverPoints = response.user.totalPoints
                 self.serverDistanceKm = response.user.totalDistanceKm
                 self.serverCO2SavedG = Double(response.user.totalCO2SavedGrams)
                 
                 if response.summary.newRidesSynced > 0 {
                     self.lastSyncPoints = response.summary.pointsEarned
+                    self.lastSyncDistanceKm = response.summary.distanceSynced ?? 0
+                    self.lastSyncMinutes = response.summary.minutesSynced ?? 0
                     UserDefaults.standard.set(response.summary.pointsEarned, forKey: "sykle_last_sync_points")
+                    UserDefaults.standard.set(self.lastSyncDistanceKm, forKey: "sykle_last_sync_distance")
+                    UserDefaults.standard.set(self.lastSyncMinutes, forKey: "sykle_last_sync_minutes")
                     self.lastSyncResult = "Synced \(response.summary.newRidesSynced) rides! +\(response.summary.pointsEarned) sykles"
                 } else {
                     self.lastSyncResult = "All rides already synced"
-                    // lastSyncPoints unchanged — keeps showing last real earn
                 }
             }
             
             print("✅ Sync complete: \(response.message)")
+            await self.refreshUser()
             
         } catch {
             await MainActor.run {
@@ -179,17 +187,15 @@ class UserManager: ObservableObject {
     
     func refreshUser() async {
         guard let userId = currentUser?.id else { return }
-        
         do {
             let user = try await networkManager.getUser(id: userId)
-            
             await MainActor.run {
                 self.currentUser = user
-                self.serverPoints = user.totalPoints
+                self.serverPoints = user.availablePoints ?? user.totalPoints
                 self.serverDistanceKm = user.totalDistanceKm
                 self.serverCO2SavedG = user.totalCO2SavedG
+                self.serverMinutes = user.totalMinutes ?? 0
             }
-            
         } catch {
             print("❌ Failed to refresh user: \(error)")
         }

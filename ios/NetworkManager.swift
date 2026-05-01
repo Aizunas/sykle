@@ -225,12 +225,12 @@ class NetworkManager: ObservableObject {
     func redeemReward(userId: String, rewardId: String) async throws -> RedeemRewardResponse {
         let requestBody = RedeemRewardRequest(userId: userId, rewardId: rewardId)
         let body = try JSONEncoder().encode(requestBody)
-        
-        return try await request(
+        let response: RedeemRewardResponse = try await request(
             endpoint: "rewards/redeem",
             method: "POST",
             body: body
         )
+        return response
     }
     
     // MARK: - Health Check
