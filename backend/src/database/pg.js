@@ -1,14 +1,17 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-    host: 'localhost',
-    database: 'sykle_db',
-    user: process.env.DB_USER || require('os').userInfo().username,
-    password: process.env.DB_PASSWORD || '',
-    port: 5432,
-});
+const pool = new Pool(
+    process.env.DATABASE_URL
+        ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+        : {
+            host: 'localhost',
+            database: 'sykle_db',
+            user: require('os').userInfo().username,
+            password: '',
+            port: 5432
+        }
+);
 
-// Test connection
 pool.connect((err, client, release) => {
     if (err) {
         console.error('❌ PostgreSQL connection error:', err.message);
@@ -18,7 +21,6 @@ pool.connect((err, client, release) => {
     }
 });
 
-// Helper functions to match existing SQLite interface
 const dbGet = async (query, params = []) => {
     const result = await pool.query(query, params);
     return result.rows[0] || null;
