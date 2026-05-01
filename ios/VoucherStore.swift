@@ -57,7 +57,6 @@ struct SavedVoucher: Identifiable, Codable {
 
     var partnerName: String { partners.first?.name ?? "" }
     var partnerDistanceMiles: String { partners.first?.distanceMiles ?? "" }
-
     var isExpired: Bool { Date() > validUntil }
 
     var validUntilString: String {
@@ -88,7 +87,10 @@ class VoucherStore: ObservableObject {
 
     @Published var vouchers: [SavedVoucher] = []
 
-    private let key = "sykle_saved_vouchers"
+    private var key: String {
+        let userId = UserDefaults.standard.string(forKey: "sykle_user_id") ?? "guest"
+        return "sykle_saved_vouchers_\(userId)"
+    }
 
     init() { load() }
 
@@ -102,6 +104,10 @@ class VoucherStore: ObservableObject {
             vouchers[index].isActive = false
             persist()
         }
+    }
+
+    func loadForCurrentUser() {
+        load()
     }
 
     var activeVouchers: [SavedVoucher] {
@@ -122,6 +128,8 @@ class VoucherStore: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: key),
            let decoded = try? JSONDecoder().decode([SavedVoucher].self, from: data) {
             vouchers = decoded
+        } else {
+            vouchers = []
         }
     }
 }

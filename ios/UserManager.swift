@@ -77,6 +77,7 @@ class UserManager: ObservableObject {
                 self.serverCO2SavedG = user.totalCO2SavedG
                 self.errorMessage = nil
                 self.saveUserId(user.id, email: email)
+                VoucherStore.shared.loadForCurrentUser()
             }
             
             print("✅ Logged in as: \(user.email) (ID: \(user.id))")
@@ -111,6 +112,7 @@ class UserManager: ObservableObject {
                     self.serverDistanceKm = user.totalDistanceKm
                     self.serverCO2SavedG = user.totalCO2SavedG
                     self.serverMinutes = user.totalMinutes ?? 0
+                    VoucherStore.shared.loadForCurrentUser()
                     
                 }
                 

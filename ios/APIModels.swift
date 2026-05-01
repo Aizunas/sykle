@@ -111,8 +111,8 @@ struct APIPartner: Codable, Identifiable, Hashable {
     let name: String
     let category: String
     let address: String?
-    let latitude: Double?
-    let longitude: Double?
+    private let latitudeString: String?
+    private let longitudeString: String?
     let imageName: String?
     let syklersVisited: String?
     let hours: APIPartnerWeeklyHours?
@@ -122,10 +122,14 @@ struct APIPartner: Codable, Identifiable, Hashable {
     let distanceMiles: Double?
     let distanceDisplay: String?
     let description: String?
-    
-    
+
+    var latitude: Double? { latitudeString.flatMap { Double($0) } }
+    var longitude: Double? { longitudeString.flatMap { Double($0) } }
+
     enum CodingKeys: String, CodingKey {
-        case id, name, category, address, latitude, longitude, hours
+        case id, name, category, address, hours, description
+        case latitudeString = "latitude"
+        case longitudeString = "longitude"
         case imageName = "image_name"
         case syklersVisited = "syklers_visited"
         case isOpen = "is_open"
@@ -133,39 +137,28 @@ struct APIPartner: Codable, Identifiable, Hashable {
         case rewardCount = "reward_count"
         case distanceMiles = "distance_miles"
         case distanceDisplay = "distance_display"
-        case description
     }
-    
-    // Convert to FakePartner for UI compatibility
+
     func toFakePartner() -> FakePartner {
         let coord = CLLocationCoordinate2D(
             latitude: latitude ?? 51.5255,
             longitude: longitude ?? -0.0755
         )
-        
-        // Build weekly hours dictionary from nested hours object
         var weeklyHours: [Int: DayHours] = [:]
         if let h = hours {
             let weekday = DayHours(open: h.weekday.open, close: h.weekday.close)
             let weekend = DayHours(open: h.weekend.open, close: h.weekend.close)
             weeklyHours = [
-                1: weekend,  // Sunday
-                2: weekday,  // Monday
-                3: weekday,  // Tuesday
-                4: weekday,  // Wednesday
-                5: weekday,  // Thursday
-                6: weekday,  // Friday
-                7: weekend   // Saturday
+                1: weekend, 2: weekday, 3: weekday,
+                4: weekday, 5: weekday, 6: weekday, 7: weekend
             ]
         }
-        
         let openHoursString: String
         if let h = hours {
             openHoursString = "\(formatTime(h.weekday.open)) – \(formatTime(h.weekday.close))"
         } else {
             openHoursString = "8:00 AM – 6:00 PM"
         }
-        
         return FakePartner(
             apiId: id,
             name: name,
@@ -180,7 +173,7 @@ struct APIPartner: Codable, Identifiable, Hashable {
             weeklyHours: weeklyHours
         )
     }
-    
+
     private func formatTime(_ time24: String) -> String {
         let parts = time24.split(separator: ":").compactMap { Int($0) }
         guard parts.count >= 1 else { return time24 }
@@ -270,7 +263,6 @@ struct Redemption: Codable, Identifiable {
 }
 
 struct RedemptionInfo: Codable {
-    let id: String
     let qrCode: String
     let expiresAt: String
 }
