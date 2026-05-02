@@ -19,6 +19,7 @@
 		335EF3F32F1D72F90098277C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F22F1D72F90098277C /* HomeView.swift */; };
 		335EF3F52F1D731B0098277C /* WorkoutsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F42F1D73190098277C /* WorkoutsListView.swift */; };
 		335EF3F72F1D732E0098277C /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335EF3F62F1D732B0098277C /* ProfileView.swift */; };
+		3376BC872FA6B8D00035BC5C /* SupportChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3376BC862FA6B8CB0035BC5C /* SupportChatView.swift */; };
 		339711672F9456E100D1CD51 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711652F9456D800D1CD51 /* SplashView.swift */; };
 		339711692F945FBF00D1CD51 /* OnboardingCarouselView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339711682F945FBB00D1CD51 /* OnboardingCarouselView.swift */; };
 		3397116B2F94617600D1CD51 /*   AuthSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3397116A2F94616E00D1CD51 /*   AuthSheet.swift */; };
@@ -80,6 +81,7 @@
 		335EF3F22F1D72F90098277C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		335EF3F42F1D73190098277C /* WorkoutsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutsListView.swift; sourceTree = "<group>"; };
 		335EF3F62F1D732B0098277C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		3376BC862FA6B8CB0035BC5C /* SupportChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportChatView.swift; sourceTree = "<group>"; };
 		339711652F9456D800D1CD51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		339711682F945FBB00D1CD51 /* OnboardingCarouselView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCarouselView.swift; sourceTree = "<group>"; };
 		3397116A2F94616E00D1CD51 /*   AuthSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "  AuthSheet.swift"; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 				339711782F95AE1000D1CD51 /* ShoreditchLondon.gpx */,
 				339711A22F98480800D1CD51 /* SykleColors.swift */,
 				332A3A9B2F9A8B1700038615 /* PartnerStore.swift */,
+				3376BC862FA6B8CB0035BC5C /* SupportChatView.swift */,
 				332A3AA12F9AA90E00038615 /* LocationManager.swift */,
 				332A3A9D2F9A8B1E00038615 /* Models.swift */,
 			);
@@ -388,6 +391,7 @@
 				339711772F95AB1700D1CD51 /* FilteredPartnersView.swift in Sources */,
 				335EF3F72F1D732E0098277C /* ProfileView.swift in Sources */,
 				332A3A9C2F9A8B1700038615 /* PartnerStore.swift in Sources */,
+				3376BC872FA6B8D00035BC5C /* SupportChatView.swift in Sources */,
 				3397118F2F96E27600D1CD51 /* VoucherView.swift in Sources */,
 				33D412722F366AA700A6F8B8 /* Secrets.swift in Sources */,
 				33D412732F366AA700A6F8B8 /* Config.swift in Sources */,

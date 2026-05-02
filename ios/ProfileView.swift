@@ -145,26 +145,29 @@ struct ProfileView: View {
                     }
 
                     // MARK: Customer support
-                    HStack(spacing: 16) {
-                        Image(systemName: "headphones")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Customer support")
-                                .font(.system(size: 15, weight: .semibold))
+                    NavigationLink(destination: SupportChatView()) {
+                        HStack(spacing: 16) {
+                            Image(systemName: "headphones")
+                                .font(.system(size: 28))
                                 .foregroundColor(.white)
-                            Text("chat with us")
-                                .font(.system(size: 13))
-                                .foregroundColor(.white.opacity(0.8))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Customer support")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.white)
+                                Text("chat with us")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            Spacer()
+                            Image(systemName: "arrow.right")
+                                .foregroundColor(.white)
                         }
-                        Spacer()
-                        Image(systemName: "arrow.right")
-                            .foregroundColor(.white)
+                        .padding(20)
+                        .background(sykleBlue)
+                        .cornerRadius(16)
+                        .padding(.horizontal, 20)
                     }
-                    .padding(20)
-                    .background(sykleBlue)
-                    .cornerRadius(16)
-                    .padding(.horizontal, 20)
+                    .buttonStyle(PlainButtonStyle())
 
                     // MARK: About the app
                     ProfileSection(title: "About the app") {
