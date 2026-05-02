@@ -272,3 +272,40 @@ struct RedemptionInfo: Codable {
 struct APIErrorResponse: Codable {
     let error: String
 }
+
+struct LeaderboardEntry: Codable, Identifiable {
+    let rank: Int
+    let id: String
+    let displayName: String
+    let weeklyCO2G: Int
+    let weeklyDistanceKm: Double
+    let weeklyRides: Int
+    let totalPoints: Int
+    
+    var initials: String {
+        let parts = displayName.split(separator: " ")
+        if parts.count >= 2 {
+            return "\(parts[0].prefix(1))\(parts[1].prefix(1))".uppercased()
+        }
+        return String(displayName.prefix(2)).uppercased()
+    }
+    
+    var shortName: String {
+        let parts = displayName.split(separator: " ")
+        if parts.count >= 2 {
+            return "\(parts[0]) \(parts[1].prefix(1))."
+        }
+        return displayName
+    }
+    
+    var co2Display: String {
+        if weeklyCO2G >= 1000 {
+            return String(format: "%.1fkg CO₂", Double(weeklyCO2G) / 1000)
+        }
+        return "\(weeklyCO2G)g CO₂"
+    }
+}
+
+struct LeaderboardResponse: Codable {
+    let leaderboard: [LeaderboardEntry]
+}

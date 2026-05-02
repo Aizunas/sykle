@@ -276,4 +276,9 @@ class NetworkManager: ObservableObject {
         struct DeleteResponse: Decodable { let message: String }
         let _: DeleteResponse = try await request(endpoint: "users/\(id)", method: "DELETE", body: nil)
     }
+    
+    func getLeaderboard() async throws -> [LeaderboardEntry] {
+        let response: LeaderboardResponse = try await request(endpoint: "leaderboard")
+        return response.leaderboard
+    }
 }

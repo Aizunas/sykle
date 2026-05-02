@@ -13,6 +13,7 @@ const userRoutes = require('./routes/userRoutes');
 const rideRoutes = require('./routes/rideRoutes');
 const partnerRoutes = require('./routes/partnerRoutes');
 const rewardRoutes = require('./routes/rewardRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
 
 // Import database initialization
 require('./database/pg');
@@ -59,6 +60,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/partners', partnerRoutes);
 app.use('/api/rewards', rewardRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 
 // Error Handling
