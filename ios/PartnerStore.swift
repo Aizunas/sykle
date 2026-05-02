@@ -65,8 +65,10 @@ class PartnerStore: ObservableObject {
     private func loadAllRewards() async {
         var newRewards: [String: [FakeReward]] = [:]
         
-        for partner in partners {
+        for (index, partner) in partners.enumerated() {
             if let apiId = partner.apiId {
+                // Stagger requests 50ms apart to avoid overwhelming Railway
+                try? await Task.sleep(nanoseconds: UInt64(index) * 50_000_000)
                 do {
                     let response = try await NetworkManager.shared.getPartner(id: apiId)
                     let rewards = response.rewards.map { $0.toFakeReward() }

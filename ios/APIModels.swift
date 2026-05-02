@@ -309,3 +309,4 @@ struct LeaderboardEntry: Codable, Identifiable {
 struct LeaderboardResponse: Codable {
     let leaderboard: [LeaderboardEntry]
 }
+

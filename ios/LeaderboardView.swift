@@ -99,6 +99,7 @@ struct LeaderboardView: View {
         do {
             entries = try await NetworkManager.shared.getLeaderboard()
         } catch {
+            print("❌ Leaderboard error: \(error)")
             errorMessage = "Couldn't load leaderboard"
         }
         isLoading = false
