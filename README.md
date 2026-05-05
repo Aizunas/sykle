@@ -15,13 +15,15 @@ London has 1.33 million daily cycling journeys but cycling accounts for only 3% 
 
 ## Features
 
-- 🗺️ **Map & Discovery** — Find nearby partner cafés and bakeries on an interactive map that centres on your location
+- 🗺️ **Map & Discovery** — Interactive map centred on your location showing nearby partner cafés and bakeries
 - 🏃 **HealthKit Integration** — Automatically syncs verified cycling workouts from Apple Health
 - 💰 **Points System** — Earns sykles based on distance and duration: `(km × 100) + (minutes × 10)`
-- 🎁 **Reward Redemption** — Add rewards to a basket and swipe to generate a QR voucher
+- 🎁 **Reward Redemption** — Add rewards to a basket and swipe to generate a QR voucher valid until closing time
 - ⭐ **Favourites** — Save your favourite partner locations
-- 👤 **User Profiles** — Full account management with stats, CO₂ saved, and ride history
-- 🔐 **Authentication** — Email + password with validation and two-step login flow
+- 👤 **User Profiles** — Full account management with lifetime stats, CO₂ saved, and ride history
+- 🔐 **Authentication** — Two-step email + password login with full validation
+- 🏆 **Leaderboard** — Weekly CO₂ savings rankings with podium display
+- 🤖 **AI Customer Support** — In-app chat assistant powered by Llama via Groq
 
 ---
 
@@ -32,9 +34,11 @@ London has 1.33 million daily cycling journeys but cycling accounts for only 3% 
 | iOS App | Swift, SwiftUI |
 | Data | HealthKit, CoreLocation, MapKit |
 | Backend | Node.js, Express |
-| Database | SQLite (sqlite3) |
+| Database | PostgreSQL |
 | Auth | bcrypt password hashing |
-| Architecture | 3-tier (iOS → REST API → SQLite) |
+| AI Support | Groq API (Llama 3.1) |
+| Deployment | Railway |
+| Architecture | 3-tier (iOS → REST API → PostgreSQL) |
 
 ---
 
@@ -48,10 +52,14 @@ sykle/
 │   ├── MapView.swift             # Interactive partner map
 │   ├── PartnerDetailView.swift   # Partner detail and reward selection
 │   ├── BasketView.swift          # Reward basket and voucher generation
+│   ├── VoucherView.swift         # QR code voucher display
+│   ├── LeaderboardView.swift     # Weekly CO₂ leaderboard
 │   ├── ProfileView.swift         # User profile and stats
+│   ├── SupportChatView.swift     # AI customer support chat
 │   ├── HealthKitManager.swift    # HealthKit integration
 │   ├── UserManager.swift         # Auth and user state
 │   ├── NetworkManager.swift      # API networking layer
+│   ├── PartnerStore.swift        # Partner and reward data management
 │   └── Models.swift              # Core data models
 │
 └── backend/                      # Node.js REST API
@@ -59,9 +67,19 @@ sykle/
     │   ├── server.js             # Express server
     │   ├── controllers/          # Business logic
     │   ├── routes/               # API routes
-    │   └── database/             # SQLite setup and seed data
-    └── data/                     # SQLite database file
+    │   └── database/             # PostgreSQL connection (pg.js)
+    └── package.json
 ```
+
+---
+
+## Live Backend
+
+The backend is deployed on Railway with PostgreSQL:
+
+**Base URL:** `https://sykle-production.up.railway.app/api`
+
+No local setup required — the iOS app connects to this URL out of the box.
 
 ---
 
@@ -75,20 +93,17 @@ npm install
 npm start
 ```
 
+Requires a `.env` file or environment variables:
+- `DATABASE_URL` — PostgreSQL connection string
+- `GROQ_API_KEY` — Groq API key for AI support chat
+
 Server runs on `http://localhost:3000`
 
 ### iOS
 
 1. Open `ios/Sykle.xcodeproj` in Xcode
-2. Create `ios/Secrets.swift` with your local IP:
-
-```swift
-struct Secrets {
-    static let localIP = "YOUR_LOCAL_IP"
-}
-```
-
-3. Run on a real iPhone (HealthKit requires a physical device)
+2. Run on a real iPhone (HealthKit requires a physical device)
+3. Or run on simulator for UI testing (HealthKit and GPS won't work)
 
 ---
 
@@ -106,6 +121,8 @@ struct Secrets {
 | GET | `/api/partners/:id` | Get partner with rewards |
 | GET | `/api/rewards` | List all rewards |
 | POST | `/api/rewards/redeem` | Redeem a reward |
+| GET | `/api/leaderboard` | Get weekly CO₂ leaderboard |
+| POST | `/api/support/chat` | AI customer support chat |
 
 ---
 
@@ -113,9 +130,20 @@ struct Secrets {
 
 ```
 sykles = (distance_km × 100) + (duration_minutes × 10)
+CO₂ saved = distance_km × 150g (vs driving)
 ```
 
-CO₂ saved is calculated at 150g per km compared to driving.
+Sykles never expire. Vouchers are valid until the partner closes on the day of redemption.
+
+---
+
+## Partner Network
+
+22 independent partner businesses across London including:
+
+**Coffee** — OA Coffee, Lannan, Cremerie, Dayz, Sede, Honu, Latte Club, Cado Cado, Varmuteo, Tio, Makeroom, Tamed Fox, Fifth Sip
+
+**Bakeries** — Browneria, Aleph, Petibon, Fufu, Neulo, La Joconde, Been Bakery, Rosemund Bakery, Signorelli Pasticceria
 
 ---
 
@@ -127,12 +155,12 @@ CO₂ saved is calculated at 150g per km compared to driving.
 |-------|-------|
 | Email | sykletester@gmail.com |
 | Password | Sykle2026 |
+| First name | Test |
+| Last name | User |
 
-first name - Test 
+### Try in browser (no iPhone needed)
 
-last name - User 
-
-This account is pre-loaded with **50,000 sykles** so you can test the full redemption flow immediately.
+https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i
 
 ### What to test
 
@@ -142,14 +170,24 @@ This account is pre-loaded with **50,000 sykles** so you can test the full redem
 4. Go into any partner and add a reward to your **basket**
 5. Swipe to generate a **voucher**
 6. Check the **Wallet** tab for your voucher history
-7. View your **Profile** — stats, settings, past orders
+7. View your **Profile** — stats, CO₂ saved, past orders
+8. Check the **Leaderboard** — weekly CO₂ rankings
+9. Tap **Customer support** to chat with the AI assistant
 
 ### Notes
 
 - Requires iPhone running iOS 16 or later
 - Location permission needed for the map
-- Health data won't sync on the test account (no real cycling workouts) — create your own account and add cycling workouts via the Health app to test syncing
-- Backend must be running — contact if you see connection errors
+- Health data won't sync on the test account — create your own account and add cycling workouts via the Health app to test syncing
+
+---
+
+## Known Limitations
+
+- HealthKit and GPS do not work in simulator or browser — requires real iPhone
+- Merchant dashboard for QR code verification is not implemented (explicitly out of scope)
+- Profile pictures are stored locally on device only and do not appear on the leaderboard
+- Apple Developer account (£79/year) required for TestFlight distribution
 
 ---
 
@@ -159,9 +197,12 @@ Built using a hybrid **Agile + Design Thinking** approach with weekly vertical s
 
 Design-first workflow: high-fidelity Figma prototypes were created before implementation, with user feedback informing each iteration.
 
+The project pivoted from third-party bike-sharing APIs (Lime, GBFS) to HealthKit as the verified data source — maintaining the core principle of verified, non-self-reported cycling data while improving data quality and reliability.
+
 
 ---
 
 ## Developer
 
-**Sanuzia Jorge**  
+**Sanuzia Jorge**
+2026
