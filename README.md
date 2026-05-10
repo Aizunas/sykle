@@ -159,8 +159,7 @@ Sykles never expire. Vouchers are valid until the partner closes on the day of r
 | Last name | User |
 
 ### Try in browser (no iPhone needed)
-
-https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i
+[https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i](https://appetize.io/app/b_2m5ajxe4p4vnkq5lnqnlexh5qy)
 
 ### What to test
 
