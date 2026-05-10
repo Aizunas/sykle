@@ -1,7 +1,7 @@
 # 🚴 Sykle — Test Account
 
 ## Try the app
-👉 https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i
+👉 [https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i](https://appetize.io/app/b_2m5ajxe4p4vnkq5lnqnlexh5qy)
 
 No iPhone needed — runs in your browser. Connects to the live backend automatically.
 
