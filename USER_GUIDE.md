@@ -61,7 +61,7 @@ The app connects to the live Railway backend by default — no local configurati
 Pre-loaded with sykles so you can test the full redemption flow immediately.
 
 ## Try in browser (no iPhone needed)
-https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i
+[https://appetize.io/app/b_hc6tmd4ummyu6knldtez2x4m3i](https://appetize.io/app/b_2m5ajxe4p4vnkq5lnqnlexh5qy)
 
 The browser version connects to the live Railway backend — no additional setup needed.
 
