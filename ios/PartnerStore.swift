@@ -13,6 +13,7 @@ import CoreLocation
 @MainActor
 class PartnerStore: ObservableObject {
     static let shared = PartnerStore()
+    private var hasRepositioned = false
     
     @Published var partners: [FakePartner] = []
     @Published var rewardsByPartner: [String: [FakeReward]] = [:]
@@ -105,13 +106,9 @@ class PartnerStore: ObservableObject {
     }
     
     func repositionPartners(around center: CLLocationCoordinate2D) {
-        // Don't reposition if already close to this location
-            if let first = partners.first {
-                let existing = CLLocation(latitude: first.coordinate.latitude, longitude: first.coordinate.longitude)
-                let new = CLLocation(latitude: center.latitude, longitude: center.longitude)
-                // Only reposition if user moved more than 100 metres
-                if existing.distance(from: new) < 100 { return }
-            }
+        guard !hasRepositioned else { return }
+            hasRepositioned = true
+        
         let offsets: [(Double, Double)] = [
             ( 0.0030,  0.0050),
             (-0.0045,  0.0030),

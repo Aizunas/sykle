@@ -52,7 +52,7 @@ struct MapView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 VStack(spacing: 0) {
                     if showSearch {
