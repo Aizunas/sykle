@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct LeaderboardView: View {
-    @StateObject private var userManager = UserManager.shared
+    @ObservedObject private var userManager = UserManager.shared
     @State private var entries: [LeaderboardEntry] = []
     @State private var isLoading = true
     @State private var errorMessage: String?

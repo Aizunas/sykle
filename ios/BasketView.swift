@@ -77,6 +77,7 @@ struct FilledBasketView: View {
     @ObservedObject private var voucherStore = VoucherStore.shared
     @State private var activeVoucher: SavedVoucher? = nil
     @StateObject private var userManager = UserManager.shared
+    @State private var redemptionComplete = false
     
 
     let sykleBlue = Color(red: 88/255, green: 134/255, blue: 185/255)
@@ -91,7 +92,10 @@ struct FilledBasketView: View {
     }
     
     var syklesAfterRedemption: Int {
-        max(0, currentSykles - basket.totalSykles)
+        if redemptionComplete {
+            return userManager.serverPoints
+        }
+        return max(0, currentSykles - basket.totalSykles)
     }
     
     var partner: FakePartner? {
@@ -99,7 +103,7 @@ struct FilledBasketView: View {
     }
     
     var canRedeem: Bool {
-        //(partner?.isCurrentlyOpen ?? false) &&
+        (partner?.isCurrentlyOpen ?? false) &&
         hasEnoughSykles
     }
 
@@ -245,6 +249,10 @@ struct FilledBasketView: View {
                                 // Refresh points
                                 await UserManager.shared.refreshUser()
                                 
+                                await MainActor.run {
+                                    redemptionComplete = true
+                                }
+                                
                             }
                         }
                     }
@@ -264,7 +272,8 @@ struct FilledBasketView: View {
                                 .foregroundColor(.red)
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                    } else if !hasEnoughSykles {
+                    } else
+                    if !hasEnoughSykles {
                         HStack(spacing: 6) {
                             Image(systemName: "exclamationmark.circle")
                                 .font(.system(size: 12))

@@ -33,26 +33,56 @@ exports.redeemReward = async (req, res) => {
         const user = await dbGet('SELECT * FROM users WHERE id = $1', [userId]);
         if (!user) return res.status(404).json({ error: 'User not found' });
 
-        const reward = await dbGet('SELECT r.*, p.name as partner_name FROM rewards r JOIN partners p ON r.partner_id = p.id WHERE r.id = $1 AND r.is_active = true', [rewardId]);
+        const reward = await dbGet(
+            'SELECT r.*, p.name as partner_name FROM rewards r JOIN partners p ON r.partner_id = p.id WHERE r.id = $1 AND r.is_active = true',
+            [rewardId]
+        );
         if (!reward) return res.status(404).json({ error: 'Reward not found' });
 
-        const spentPoints = await dbGet("SELECT COALESCE(SUM(points_spent),0) as total FROM redemptions WHERE user_id = $1 AND status IN ('pending','completed')", [userId]);
-        const availablePoints = user.total_points - parseInt(spentPoints.total);
-        if (availablePoints < reward.points_cost) return res.status(400).json({ error: 'Insufficient points', required: reward.points_cost, available: availablePoints });
+        // Use available_points directly - single source of truth
+        const availablePoints = user.available_points !== null ? user.available_points : user.total_points;
+
+        if (availablePoints < reward.points_cost) {
+            return res.status(400).json({
+                error: 'Insufficient points',
+                required: reward.points_cost,
+                available: availablePoints
+            });
+        }
 
         const qrCode = 'SYKLE-' + require('crypto').randomBytes(4).toString('hex').toUpperCase();
         const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        // Deduct from BOTH columns atomically to keep them in sync
+        await dbRun(
+            `UPDATE users SET 
+                available_points = available_points - $1,
+                total_points = total_points - $1,
+                updated_at = NOW()
+            WHERE id = $2 AND available_points >= $1`,
+            [reward.points_cost, userId]
+        );
+
+        // Check the update actually happened (race condition protection)
+        const updated = await dbGet('SELECT available_points FROM users WHERE id = $1', [userId]);
+        if (updated.available_points < 0) {
+            // Rollback
+            await dbRun(
+                'UPDATE users SET available_points = available_points + $1, total_points = total_points + $1 WHERE id = $2',
+                [reward.points_cost, userId]
+            );
+            return res.status(400).json({ error: 'Insufficient points' });
+        }
 
         await dbRun(
             "INSERT INTO redemptions (user_id, reward_id, partner_id, points_spent, qr_code, status, expires_at) VALUES ($1,$2,$3,$4,$5,'pending',$6)",
             [userId, rewardId, reward.partner_id, reward.points_cost, qrCode, expiresAt]
         );
-        await dbRun('UPDATE users SET total_points = total_points - $1, updated_at = NOW() WHERE id = $2', [reward.points_cost, userId]);
 
         res.status(201).json({
             message: 'Reward redeemed successfully',
             redemption: { qrCode, expiresAt },
-            remainingPoints: availablePoints - reward.points_cost
+            remainingPoints: updated.available_points
         });
     } catch (error) {
         console.error('Error redeeming reward:', error);

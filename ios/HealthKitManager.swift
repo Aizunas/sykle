@@ -103,7 +103,7 @@ class HealthKitManager: ObservableObject {
                 self.errorMessage = "HealthKit is not available. Please use a real iPhone."
             }
             return
-        }
+        }  
         
         let typesToRead: Set<HKObjectType> = [
             HKObjectType.workoutType(),

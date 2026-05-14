@@ -164,10 +164,7 @@ struct MapView: View {
             }
             .onChange(of: locationManager.userLocation?.latitude) { _, _ in
                 guard let location = locationManager.userLocation else { return }
-                region = MKCoordinateRegion(
-                    center: location,
-                    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-                )
+                // Only reposition partners, don't reset the region
                 partnerStore.repositionPartners(around: location)
             }
         }

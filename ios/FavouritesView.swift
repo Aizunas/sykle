@@ -39,7 +39,6 @@ class FavouritesManager: ObservableObject {
 
     func load() {
         guard let names = UserDefaults.standard.stringArray(forKey: key) else { return }
-        // Reconstruct FakePartner objects from PartnerStore or fallback to fakePartners
         let store = PartnerStore.shared
         favourites = names.compactMap { name in
             store.partners.first { $0.name == name } ?? fakePartners.first { $0.name == name }
@@ -128,6 +127,7 @@ struct FavouritesView: View {
             if !partnerStore.hasLoaded {
                 await partnerStore.loadPartners()
             }
+            FavouritesManager.shared.refreshFromStore()
         }
     }
 }
