@@ -14,6 +14,7 @@ struct PartnerDetailView: View {
     @ObservedObject private var basket = BasketManager.shared
     @Environment(\.dismiss) var dismiss
     var cameFromFavourites: Bool = false
+    @State private var showFavourites = false
 
     @State private var selectedTab: RewardTab = .all
     @State private var showInfo = false
@@ -229,7 +230,7 @@ struct PartnerDetailView: View {
                             .font(.system(size: 20))
                     }
                 } else {
-                    NavigationLink(destination: FavouritesView()) {
+                    Button(action: { showFavourites = true }) {
                         Image(systemName: "star")
                             .foregroundColor(.black)
                             .font(.system(size: 20))
@@ -248,6 +249,11 @@ struct PartnerDetailView: View {
                         }
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $showFavourites) {
+            NavigationView {
+                FavouritesView()
             }
         }
         .sheet(isPresented: $showBasket) {

@@ -156,16 +156,19 @@ struct MapView: View {
             }
             .onAppear {
                 guard let location = locationManager.userLocation else { return }
-                region = MKCoordinateRegion(
-                    center: location,
-                    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-                )
-                partnerStore.repositionPartners(around: location)
+                // Only update region if it's still at default position
+                if region.center.latitude == 51.5255 && region.center.longitude == -0.0755 {
+                    region = MKCoordinateRegion(
+                        center: location,
+                        span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+                    )
+                    partnerStore.repositionPartners(around: location)
+                }
             }
             .onChange(of: locationManager.userLocation?.latitude) { _, _ in
-                guard let location = locationManager.userLocation else { return }
+                
                 // Only reposition partners, don't reset the region
-                partnerStore.repositionPartners(around: location)
+              
             }
         }
     }
@@ -218,9 +221,18 @@ struct PartnerMapView: View {
     @Binding var region: MKCoordinateRegion
     let partners: [FakePartner]
     @Binding var selectedPartner: FakePartner?
+    
+    @State private var mapRegion: MKCoordinateRegion
+    
+    init(region: Binding<MKCoordinateRegion>, partners: [FakePartner], selectedPartner: Binding<FakePartner?>) {
+        self._region = region
+        self.partners = partners
+        self._selectedPartner = selectedPartner
+        self._mapRegion = State(initialValue: region.wrappedValue)
+    }
 
     var body: some View {
-        Map(coordinateRegion: $region,
+        Map(coordinateRegion: $mapRegion,
             showsUserLocation: true,
             annotationItems: partners) { partner in
             MapAnnotation(coordinate: partner.coordinate) {
@@ -236,6 +248,9 @@ struct PartnerMapView: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
+        .onAppear {
+            mapRegion = region
+        }
     }
 }
 
