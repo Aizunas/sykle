@@ -1,8 +1,8 @@
-const { dbAll } = require('../database/pg');
+const { dbAll, dbGet } = require('../database/pg');
 
 exports.getLeaderboard = async (req, res) => {
     try {
-        const { limit = 10 } = req.query;
+        const { limit = 10, userId } = req.query;
 
         const users = await dbAll(
             `SELECT 
@@ -19,12 +19,12 @@ exports.getLeaderboard = async (req, res) => {
             LEFT JOIN rides r ON r.user_id = u.id 
                 AND r.start_date >= NOW() - INTERVAL '7 days'
             GROUP BY u.id, u.first_name, u.last_name, u.total_points, u.total_distance_km, u.total_co2_saved_g
-            ORDER BY weekly_co2 DESC
-            LIMIT $1`,
-            [parseInt(limit)]
+            ORDER BY weekly_co2 DESC`,
+            []
         );
 
-        const leaderboard = users.map((user, index) => ({
+        // Assign ranks to all users
+        const allRanked = users.map((user, index) => ({
             rank: index + 1,
             id: user.id,
             displayName: [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Cyclist',
@@ -34,7 +34,20 @@ exports.getLeaderboard = async (req, res) => {
             totalPoints: user.total_points
         }));
 
-        res.json({ leaderboard });
+        // Top 10
+        const leaderboard = allRanked.slice(0, parseInt(limit));
+
+        // If userId provided and not in top 10, find their rank
+        let currentUser = null;
+        if (userId) {
+            const inTop10 = leaderboard.find(u => u.id === userId);
+            if (!inTop10) {
+                currentUser = allRanked.find(u => u.id === userId) || null;
+            }
+        }
+
+        res.json({ leaderboard, currentUser });
+
     } catch (error) {
         console.error('Error getting leaderboard:', error);
         res.status(500).json({ error: 'Failed to get leaderboard' });

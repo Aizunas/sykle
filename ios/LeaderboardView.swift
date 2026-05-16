@@ -10,14 +10,15 @@ struct LeaderboardView: View {
     @State private var entries: [LeaderboardEntry] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var currentUserOutsideTop10: LeaderboardEntry? = nil
 
     let sykleBlue = Color(red: 88/255, green: 134/255, blue: 185/255)
     let cardBlue = Color(red: 173/255, green: 210/255, blue: 235/255)
 
     var currentUserEntry: LeaderboardEntry? {
-        entries.first { $0.id == userManager.currentUser?.id }
+        entries.first { $0.id == userManager.currentUser?.id } ?? currentUserOutsideTop10
     }
-
+    
     var top3: [LeaderboardEntry] { Array(entries.prefix(3)) }
     var rest: [LeaderboardEntry] { Array(entries.dropFirst(3)) }
 
@@ -97,7 +98,9 @@ struct LeaderboardView: View {
     private func loadLeaderboard() async {
         isLoading = true
         do {
-            entries = try await NetworkManager.shared.getLeaderboard()
+            let response = try await NetworkManager.shared.getLeaderboard()
+            entries = response.leaderboard
+            currentUserOutsideTop10 = response.currentUser
         } catch {
             print("❌ Leaderboard error: \(error)")
             errorMessage = "Couldn't load leaderboard"

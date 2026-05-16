@@ -277,8 +277,13 @@ class NetworkManager: ObservableObject {
         let _: DeleteResponse = try await request(endpoint: "users/\(id)", method: "DELETE", body: nil)
     }
     
-    func getLeaderboard() async throws -> [LeaderboardEntry] {
-        let response: LeaderboardResponse = try await request(endpoint: "leaderboard")
-        return response.leaderboard
+    func getLeaderboard() async throws -> LeaderboardResponse {
+        var endpoint = "leaderboard"
+        if let userId = UserManager.shared.currentUser?.id {
+            endpoint += "?userId=\(userId)"
+        }
+        let response: LeaderboardResponse = try await request(endpoint: endpoint)
+        return response
     }
+
 }
